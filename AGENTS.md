@@ -1,9 +1,12 @@
 # AGENTS.md - LLM TimesFM Crypto
 
+This is the source-of-truth instruction file for this repository.
+
 ## Project Mode
 
 This is an open, public, fully automated Laravel project.
 
+- Public repository: `https://github.com/goleaf/llm-timesfm`
 - No authentication, login, registration, users, password reset, private panels, or role systems.
 - No application controllers for public pages.
 - Public pages must be full-page Livewire components.
@@ -13,20 +16,22 @@ This is an open, public, fully automated Laravel project.
 - Keep Binance and TimesFM integrations public-source only, configured through `.env` and `config/crypto.php`.
 - Automation must run through Artisan commands and Laravel Scheduler, not queue workers.
 - Use Eloquent models and actions for data access. Do not query in Blade.
+- Keep every Markdown file current when project rules, setup, screens, automation, or workflow changes.
 
 ## Required End-Of-Prompt Workflow
 
 Every completed Codex task must do these steps before the final response:
 
 1. Update `CHANGELOG.md` in normal human language.
-2. Run formatting and verification:
+2. Update every relevant Markdown file, not only the changelog.
+3. Run formatting and verification:
    - `./vendor/bin/pint --dirty --test`
    - `php artisan test`
    - `npm run build`
-3. Inspect `git status --short`.
-4. Commit with a Conventional Commit message.
-5. Push the commit to the public GitHub repository.
-6. In the final response, report the commit hash, pushed branch, and the useful verification results.
+4. Inspect `git status --short`.
+5. Commit with a Conventional Commit message.
+6. Push the commit to the public GitHub repository.
+7. In the final response, report the commit hash, pushed branch, and the useful verification results.
 
 If pushing is blocked by authentication, network, or repository permissions, state the exact blocker and leave the local commit ready.
 
@@ -42,5 +47,6 @@ If pushing is blocked by authentication, network, or repository permissions, sta
 
 - The repository must stay public.
 - Push after each completed prompt when verification passes.
+- Push to `origin/main` unless the user explicitly asks for another branch.
 - Do not commit `.env`, local databases, local Python environments, `vendor`, `node_modules`, or build output.
 - Keep commit messages in Conventional Commits format.

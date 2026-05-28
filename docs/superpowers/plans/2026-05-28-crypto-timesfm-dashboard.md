@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Ship a local realtime crypto dashboard with Binance JSON history and TimesFM-compatible forecasting.
+**Goal:** Ship a local realtime crypto dashboard with Binance JSON history, TimesFM-compatible forecasting, and forecast accuracy tracking.
 
-**Architecture:** Laravel commands ingest Binance data into SQLite through Eloquent actions. Livewire renders from local models with one-second polling. Forecasts are delegated to a Python bridge and stored back in Eloquent.
+**Architecture:** Laravel commands ingest Binance data into SQLite through Eloquent actions. Full-page Livewire components render from local models with polling. Forecasts are delegated to a Python bridge, stored as forecast runs and forecast points, then compared against later candles.
 
 **Tech Stack:** Laravel 13, Livewire 4, Blade, Vite, SCSS, Tailwind CSS 4, SQLite, Binance Spot public API, Python TimesFM.
 
@@ -51,3 +51,17 @@
 - [x] Run full test suite.
 - [x] Run Vite build.
 - [x] Start local dev server and verify the dashboard route.
+
+### Task 7: Forecast Accuracy
+
+- [x] Store forecast points with their target candle time.
+- [x] Compare mature forecast points with real candle closes.
+- [x] Track mean error, percentage error, and direction accuracy.
+- [x] Add a real-time statistics screen for forecast quality.
+
+### Task 8: Public Automation Rules
+
+- [x] Keep the project open with no user accounts or login system.
+- [x] Keep public screens on full-page Livewire components.
+- [x] Forbid Volt and standard public controllers.
+- [x] Keep every completed prompt documented, committed, and pushed to the public repository.

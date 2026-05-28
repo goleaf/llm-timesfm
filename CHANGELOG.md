@@ -4,6 +4,7 @@ This file is the human-readable history of the project. It must be updated after
 
 ## 2026-05-28
 
+- Refreshed the project documentation so every Markdown file now points to the public repository, describes the Livewire-only rule, explains the automated market pipeline, and records the required commit-and-push workflow.
 - Converted the project into an open public crypto forecasting dashboard with no login, registration, user accounts, password reset, or private access flow.
 - Removed the default Laravel connection systems that were not needed for this public project, including database-backed sessions, cache storage, queue jobs, mail settings, cloud storage settings, and user tables.
 - Added automated market ingestion for popular Binance spot pairs, including full ticker snapshots, market metadata, short candle history, forecast storage, and forecast accuracy tracking.

@@ -4,6 +4,8 @@
 
 **Goal:** Keep the project fully public, automated, and Livewire-only.
 
+**Repository:** `https://github.com/goleaf/llm-timesfm`
+
 ## Tasks
 
 - [x] Remove default app controllers.
@@ -15,3 +17,11 @@
 - [x] Add permanent project rules to `AGENTS.md`.
 - [x] Add a human-readable changelog process.
 - [x] Require verification, commit, and push at the end of each completed prompt.
+- [x] Keep all Markdown documentation synchronized after each prompt.
+- [x] Push the public repository on `main`.
+
+## Guard Rails
+
+- Architecture tests must fail if login, registration, user tables, Volt, public controllers, or non-Livewire public Blade screens return.
+- The changelog must stay readable for a project owner, not written as a code diff.
+- Automation must stay scheduler-driven so the project can run unattended.
