@@ -208,7 +208,19 @@
                     </div>
 
                     <div class="px-4 pb-4">
-                        <div data-interactive-chart class="relative h-[25rem] overflow-hidden rounded-md border border-white/10 bg-[#0b0d10] 2xl:h-[36rem]">
+                        <div data-interactive-chart data-chart-key="{{ $selectedAsset?->symbol ?? 'market' }}-{{ $interval }}" class="relative h-[25rem] overflow-hidden rounded-md border border-white/10 bg-[#0b0d10] 2xl:h-[36rem]">
+                            <div data-chart-control class="absolute right-3 top-3 z-10 flex items-center gap-1 rounded-md border border-white/10 bg-zinc-950/85 p-1 shadow-lg shadow-black/30">
+                                <span data-chart-zoom-label class="min-w-12 px-2 text-center text-xs font-semibold text-zinc-300">100%</span>
+                                <button type="button" data-chart-zoom="out" aria-label="Zoom out" class="h-8 w-8 rounded-md border border-white/10 text-sm font-semibold text-zinc-100 hover:bg-white/[0.08]">
+                                    -
+                                </button>
+                                <button type="button" data-chart-zoom="in" aria-label="Zoom in" class="h-8 w-8 rounded-md border border-white/10 text-sm font-semibold text-zinc-100 hover:bg-white/[0.08]">
+                                    +
+                                </button>
+                                <button type="button" data-chart-zoom="reset" aria-label="Reset zoom" class="h-8 rounded-md border border-white/10 px-2 text-xs font-semibold text-zinc-100 hover:bg-white/[0.08]">
+                                    1:1
+                                </button>
+                            </div>
                             <svg viewBox="0 0 720 260" role="img" class="h-full w-full">
                                 <rect width="720" height="260" fill="#0b0d10"></rect>
                                 <line x1="18" y1="242" x2="702" y2="242" stroke="#3f3f46" stroke-width="1"></line>
