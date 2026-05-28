@@ -1,6 +1,6 @@
-<main wire:poll.visible.1000ms="refreshMarket" class="min-h-screen bg-[#0b0d10] text-zinc-100">
-    <section class="mx-auto flex min-h-screen w-full max-w-[120rem] flex-col gap-4 px-4 py-4 sm:px-6 2xl:px-8">
-        <header class="grid gap-4 border-b border-white/10 pb-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-end">
+<main wire:poll.visible.1000ms="refreshMarket" class="crypto-workbench min-h-screen text-zinc-100">
+    <section class="workbench-container mx-auto flex min-h-screen w-full max-w-[120rem] flex-col gap-4 px-4 py-4 sm:px-6 2xl:px-8">
+        <header class="workbench-header grid gap-4 pb-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-end">
             <div>
                 <p class="text-xs font-semibold uppercase text-cyan-300">{{ __('ui.market.eyebrow') }}</p>
                 <h1 class="mt-1 text-3xl font-semibold tracking-normal text-white sm:text-4xl">{{ __('ui.market.title') }}</h1>
@@ -76,7 +76,7 @@
                                 <span class="text-xs text-zinc-500">{{ __('ui.market.shown', ['count' => $board['base_options']->count()]) }}</span>
                             </div>
 
-                            <div class="max-h-56 overflow-auto">
+                            <div class="workbench-scroll max-h-56 overflow-auto">
                                 @forelse ($board['base_options'] as $option)
                                     <div wire:key="base-option-{{ $option['asset'] }}" class="grid grid-cols-[minmax(0,1fr)_3.5rem] gap-2 border-b border-white/5 px-3 py-2 {{ $option['is_selected'] ? 'bg-cyan-300/10' : '' }}">
                                         <button type="button" wire:click="setBaseSearch('{{ $option['asset'] }}')" class="min-w-0 text-left">
@@ -119,7 +119,7 @@
                     </div>
                 </div>
 
-                <div class="max-h-[calc(100vh-16rem)] overflow-y-auto 2xl:max-h-[calc(100vh-14rem)]">
+                <div class="workbench-scroll max-h-[calc(100vh-16rem)] overflow-y-auto 2xl:max-h-[calc(100vh-14rem)]">
                     @forelse ($board['filtered'] as $row)
                         <div wire:key="market-row-{{ $row['symbol'] }}" class="grid grid-cols-[minmax(0,1fr)_3.25rem] gap-2 border-b border-white/5 px-3 py-3 {{ $row['is_selected'] ? 'bg-cyan-300/10' : '' }}">
                             <button type="button" wire:click="selectAsset('{{ $row['symbol'] }}')" class="min-w-0 text-left">
@@ -313,9 +313,9 @@
                                 <h3 class="text-xs font-semibold uppercase text-zinc-400">{{ __('ui.market.chart_point_ledger') }}</h3>
                                 <span class="text-xs text-zinc-500">{{ __('ui.market.visible_rows', ['count' => count($chart['point_ledger'])]) }}</span>
                             </div>
-                            <div class="max-h-72 overflow-auto">
+                            <div class="workbench-scroll max-h-72 overflow-auto">
                                 @forelse ($chart['point_ledger'] as $index => $row)
-                                    <div wire:key="chart-ledger-{{ $index }}-{{ $row['series'] }}-{{ $row['time'] }}" class="grid gap-2 border-b border-white/5 px-3 py-2 text-xs lg:grid-cols-[7rem_9rem_minmax(0,1fr)_minmax(0,1fr)_8rem]">
+                                    <div wire:key="chart-ledger-{{ $index }}-{{ $row['series'] }}-{{ $row['time'] }}" class="workbench-table-row grid gap-2 border-b border-white/5 px-3 py-2 text-xs lg:grid-cols-[7rem_9rem_minmax(0,1fr)_minmax(0,1fr)_8rem]">
                                         <span class="flex min-w-0 items-center gap-2">
                                             <span class="h-2 w-2 shrink-0 rounded-full" style="background: {{ $row['color'] }}"></span>
                                             <span class="truncate font-semibold text-zinc-100">{{ $row['series'] }}</span>
@@ -339,9 +339,9 @@
                         <span class="text-xs text-zinc-500">{{ __('ui.market.updates', ['count' => $snapshots->count()]) }}</span>
                     </div>
 
-                    <div class="max-h-80 overflow-auto">
+                    <div class="workbench-scroll max-h-80 overflow-auto">
                         @forelse ($snapshots as $snapshot)
-                            <div wire:key="tick-{{ $snapshot->id }}" class="grid grid-cols-[5rem_minmax(0,1fr)_minmax(0,1fr)_7rem] gap-3 border-b border-white/5 px-4 py-3 text-sm">
+                            <div wire:key="tick-{{ $snapshot->id }}" class="workbench-table-row grid grid-cols-[5rem_minmax(0,1fr)_minmax(0,1fr)_7rem] gap-3 border-b border-white/5 px-4 py-3 text-sm">
                                 <span class="font-mono text-xs text-zinc-500">{{ $snapshot->source_event_at->format('H:i:s') }}</span>
                                 <span class="font-semibold text-white">{{ number_format((float) $snapshot->price, (float) $snapshot->price >= 1 ? 2 : 8) }}</span>
                                 <span class="text-zinc-400">{{ number_format((float) $snapshot->bid_price, (float) $snapshot->bid_price >= 1 ? 2 : 8) }} / {{ number_format((float) $snapshot->ask_price, (float) $snapshot->ask_price >= 1 ? 2 : 8) }}</span>
@@ -361,7 +361,7 @@
                         <span class="text-xs text-zinc-500">{{ $board['pinned']->count() }}/12</span>
                     </div>
 
-                    <div class="max-h-[24rem] overflow-auto 2xl:max-h-[36rem]">
+                    <div class="workbench-scroll max-h-[24rem] overflow-auto 2xl:max-h-[36rem]">
                         @forelse ($board['pinned'] as $row)
                             <div wire:key="pinned-{{ $row['symbol'] }}" class="grid grid-cols-[minmax(0,1fr)_3.5rem] gap-2 border-b border-white/5 px-4 py-3">
                                 <button type="button" wire:click="selectAsset('{{ $row['symbol'] }}')" class="min-w-0 text-left">
@@ -452,7 +452,7 @@
                         </button>
                     </form>
 
-                    <div class="max-h-72 overflow-auto border-t border-white/10">
+                    <div class="workbench-scroll max-h-72 overflow-auto border-t border-white/10">
                         @forelse ($predictionStakes as $stake)
                             @php
                                 $stakeStatusClass = match ($stake->status) {
@@ -531,7 +531,7 @@
                             <div class="rounded-md border border-white/10 bg-white/[0.04] p-3">
                                 <p class="text-xs text-zinc-500">{{ __('ui.market.latest_analyses') }}</p>
                                 <p class="mt-1 text-sm font-semibold text-white">{{ __('ui.market.engines_points', ['engines' => $forecasts->count(), 'points' => $forecast?->horizon ?? 0]) }}</p>
-                                <div class="mt-3 max-h-64 overflow-auto text-xs text-zinc-300">
+                                <div class="workbench-scroll mt-3 max-h-64 overflow-auto text-xs text-zinc-300">
                                     @foreach ($forecasts as $run)
                                         <div wire:key="forecast-run-summary-{{ $run->id }}" class="border-b border-white/5 py-2">
                                             <div class="flex items-center justify-between gap-3">

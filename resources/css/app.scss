@@ -2,6 +2,12 @@ html {
     color-scheme: dark;
 }
 
+body {
+    background:
+        linear-gradient(180deg, rgba(12, 14, 18, 0.98), rgba(6, 7, 9, 1) 58%),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 96px);
+}
+
 button {
     cursor: pointer;
 }
@@ -13,4 +19,143 @@ button:disabled {
 
 summary {
     list-style-position: inside;
+}
+
+.crypto-workbench {
+    min-height: 100vh;
+    background:
+        linear-gradient(180deg, rgba(15, 18, 22, 0.92), rgba(7, 8, 10, 0.98)),
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 48px);
+}
+
+.crypto-workbench .workbench-container {
+    position: relative;
+}
+
+.crypto-workbench .workbench-container::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 72px 72px;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.45), transparent 70%);
+}
+
+.crypto-workbench .workbench-header {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    margin-inline: -1rem;
+    padding-inline: 1rem;
+    padding-top: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.11);
+    background: rgba(7, 8, 10, 0.82);
+    backdrop-filter: blur(18px);
+}
+
+@media (min-width: 640px) {
+    .crypto-workbench .workbench-header {
+        margin-inline: -1.5rem;
+        padding-inline: 1.5rem;
+    }
+}
+
+@media (min-width: 1536px) {
+    .crypto-workbench .workbench-header {
+        margin-inline: -2rem;
+        padding-inline: 2rem;
+    }
+}
+
+.crypto-workbench h1,
+.crypto-workbench h2,
+.crypto-workbench h3 {
+    letter-spacing: 0;
+}
+
+.crypto-workbench input,
+.crypto-workbench select,
+.crypto-workbench textarea {
+    background: rgba(6, 7, 9, 0.72);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.crypto-workbench input:focus,
+.crypto-workbench select:focus,
+.crypto-workbench textarea:focus {
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 0 0 3px rgba(34, 211, 238, 0.14);
+}
+
+.crypto-workbench aside.rounded-md,
+.crypto-workbench section.rounded-md,
+.crypto-workbench div.rounded-md.border {
+    border-color: rgba(255, 255, 255, 0.105);
+    background:
+        linear-gradient(180deg, rgba(20, 22, 26, 0.96), rgba(13, 14, 17, 0.98));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.045),
+        0 18px 50px rgba(0, 0, 0, 0.22);
+}
+
+.crypto-workbench [data-interactive-chart] {
+    border-color: rgba(34, 211, 238, 0.16);
+    background:
+        linear-gradient(180deg, rgba(8, 10, 12, 0.98), rgba(5, 6, 8, 0.98)),
+        repeating-linear-gradient(90deg, rgba(34, 211, 238, 0.04) 0 1px, transparent 1px 72px);
+    box-shadow:
+        inset 0 1px 0 rgba(34, 211, 238, 0.08),
+        0 24px 70px rgba(0, 0, 0, 0.28);
+}
+
+.crypto-workbench [data-chart-control] {
+    backdrop-filter: blur(14px);
+}
+
+.crypto-workbench button,
+.crypto-workbench a {
+    transition:
+        background-color 160ms ease,
+        border-color 160ms ease,
+        color 160ms ease,
+        opacity 160ms ease,
+        transform 160ms ease;
+}
+
+.crypto-workbench button:hover,
+.crypto-workbench a:hover {
+    transform: translateY(-1px);
+}
+
+.crypto-workbench button:active,
+.crypto-workbench a:active {
+    transform: translateY(0);
+}
+
+.crypto-workbench .workbench-scroll {
+    scrollbar-color: rgba(34, 211, 238, 0.38) rgba(255, 255, 255, 0.04);
+    scrollbar-width: thin;
+}
+
+.crypto-workbench .workbench-scroll::-webkit-scrollbar {
+    height: 0.7rem;
+    width: 0.7rem;
+}
+
+.crypto-workbench .workbench-scroll::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.035);
+}
+
+.crypto-workbench .workbench-scroll::-webkit-scrollbar-thumb {
+    border: 2px solid rgba(10, 11, 13, 0.9);
+    border-radius: 999px;
+    background: rgba(34, 211, 238, 0.45);
+}
+
+.crypto-workbench .workbench-table-row:hover {
+    background: rgba(255, 255, 255, 0.035);
 }

@@ -22,6 +22,8 @@ The market screen targets Full HD workstations. It uses a wide shell with a left
 
 The forecast statistics screen is a full diagnostic surface, not a small summary. It shows market context, source counts, coverage, MAPE, MAE, direction accuracy, engine breakdowns, ranked best and worst points, evaluated point details, pending target rows, and forecast-run windows from preloaded action data.
 
+All public dashboard screens share a workbench visual layer. The market, analysis, and statistics pages use the same sticky header treatment, dense panel surfaces, chart framing, custom scroll regions, hoverable data rows, and wide monitor spacing so the application reads as one operational tool.
+
 The public interface is Russian-first with a persistent RU / EN language switcher. User-facing dashboard copy, action messages, chart labels, analysis text, and statistics text are translated through language files so the same Livewire screens can render in Russian or English.
 
 ## Data Flow
@@ -54,5 +56,6 @@ The public interface is Russian-first with a persistent RU / EN language switche
 - Realtime reads should use cache actions with short TTLs and explicit invalidation after market writes.
 - Growing market tables need composite indexes that match actual Eloquent filters and sort order.
 - Full HD layout should stay wide and data-dense; do not compress the dashboard back into a narrow centered column.
+- Reuse the shared workbench visual layer for public dashboard pages; avoid one-off narrow shells or unrelated page styling.
 - Russian remains the default public language, and every new public UI label needs both Russian and English translations.
 - Every completed prompt must update the changelog, keep Markdown current, pass checks, commit, and push.

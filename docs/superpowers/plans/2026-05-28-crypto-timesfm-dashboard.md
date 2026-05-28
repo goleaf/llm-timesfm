@@ -120,3 +120,10 @@
 - [x] Add engine-by-engine scoring with runs, evaluated points, pending points, MAPE, MAE, and direction accuracy.
 - [x] Add best and worst evaluated forecast points, detailed evaluated rows, pending forecast targets, and full forecast-run windows.
 - [x] Keep the statistics page Livewire-only, Russian-first, translated, and backed by action-prepared data.
+
+### Task 16: Public Workbench Interface
+
+- [x] Redesign the market, analysis, and statistics screens around one shared workbench visual layer.
+- [x] Add sticky public dashboard headers, layered backgrounds, denser panel surfaces, stronger chart framing, custom scroll areas, and hoverable data rows.
+- [x] Keep the redesign CSS-driven and Livewire-only without controllers, Volt, new authentication, or frontend framework changes.
+- [x] Keep the Full HD market workspace, expanded statistics surface, RU / EN switcher, and one-second live update behavior intact.

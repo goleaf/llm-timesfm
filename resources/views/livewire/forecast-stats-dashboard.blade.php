@@ -17,9 +17,9 @@
     $snapshot = $selectedAsset?->latestSnapshot;
 @endphp
 
-<main wire:poll.visible.1000ms="refreshStats" class="min-h-screen bg-[#0b0d10]">
-    <section class="mx-auto flex min-h-screen w-full max-w-[120rem] flex-col gap-5 px-4 py-5 sm:px-6 2xl:px-8">
-        <header class="flex flex-col gap-4 border-b border-white/10 pb-4 lg:flex-row lg:items-end lg:justify-between">
+<main wire:poll.visible.1000ms="refreshStats" class="crypto-workbench min-h-screen">
+    <section class="workbench-container mx-auto flex min-h-screen w-full max-w-[120rem] flex-col gap-5 px-4 py-5 sm:px-6 2xl:px-8">
+        <header class="workbench-header flex flex-col gap-4 pb-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
                 <p class="text-sm font-medium text-cyan-300">{{ __('ui.stats.eyebrow') }}</p>
                 <h1 class="mt-1 text-3xl font-semibold tracking-normal text-white sm:text-4xl">{{ __('ui.stats.title') }}</h1>
@@ -52,7 +52,7 @@
                     <span class="text-xs text-zinc-500">{{ $assets->count() }}</span>
                 </div>
 
-                <div class="max-h-[calc(100vh-11rem)] overflow-y-auto">
+                <div class="workbench-scroll max-h-[calc(100vh-11rem)] overflow-y-auto">
                     @forelse ($assets as $asset)
                         @php
                             $isSelected = $selectedAsset?->is($asset);
@@ -243,7 +243,7 @@
                         <span class="text-xs text-zinc-500">{{ $engineRows->count() }}</span>
                     </div>
 
-                    <div class="overflow-x-auto">
+                    <div class="workbench-scroll overflow-x-auto">
                         <div class="min-w-[58rem]">
                             <div class="grid grid-cols-[10rem_5rem_6rem_6rem_7rem_8rem_8rem_10rem] gap-3 border-b border-white/10 px-4 py-2 text-xs font-semibold uppercase text-zinc-500">
                                 <span>{{ __('ui.stats.source') }}</span>
@@ -257,7 +257,7 @@
                             </div>
 
                             @forelse ($engineRows as $row)
-                                <div wire:key="engine-row-{{ $row['source'] }}" class="grid grid-cols-[10rem_5rem_6rem_6rem_7rem_8rem_8rem_10rem] gap-3 border-b border-white/5 px-4 py-3 text-sm">
+                                <div wire:key="engine-row-{{ $row['source'] }}" class="workbench-table-row grid grid-cols-[10rem_5rem_6rem_6rem_7rem_8rem_8rem_10rem] gap-3 border-b border-white/5 px-4 py-3 text-sm">
                                     <span class="truncate font-semibold text-white">{{ $row['source'] }}</span>
                                     <span class="text-zinc-300">{{ $row['runs'] }}</span>
                                     <span class="text-zinc-300">{{ $row['evaluated_points'] }}</span>
@@ -282,9 +282,9 @@
                                 <span class="text-xs text-zinc-500">{{ $panel['rows']->count() }}</span>
                             </div>
 
-                            <div class="max-h-96 overflow-auto">
+                            <div class="workbench-scroll max-h-96 overflow-auto">
                                 @forelse ($panel['rows'] as $point)
-                                    <div wire:key="ranked-point-{{ $panel['key'] }}-{{ $point->id }}" class="grid grid-cols-[7rem_6rem_minmax(0,1fr)_6rem] gap-3 border-b border-white/5 px-4 py-3 text-sm">
+                                    <div wire:key="ranked-point-{{ $panel['key'] }}-{{ $point->id }}" class="workbench-table-row grid grid-cols-[7rem_6rem_minmax(0,1fr)_6rem] gap-3 border-b border-white/5 px-4 py-3 text-sm">
                                         <span class="truncate text-zinc-400">{{ $point->target_open_time->format('m-d H:i') }}</span>
                                         <span class="truncate font-semibold text-white">{{ $point->source }}</span>
                                         <span class="truncate text-zinc-300">{{ $formatPrice($point->predicted_price) }} / {{ $formatPrice($point->actual_close_price) }}</span>
@@ -304,7 +304,7 @@
                         <span class="text-xs text-zinc-500">{{ $points->count() }}</span>
                     </div>
 
-                    <div class="overflow-x-auto">
+                    <div class="workbench-scroll overflow-x-auto">
                         <div class="min-w-[82rem]">
                             <div class="grid grid-cols-[8rem_8rem_6rem_9rem_9rem_9rem_9rem_7rem_7rem_8rem] gap-3 border-b border-white/10 px-4 py-2 text-xs font-semibold uppercase text-zinc-500">
                                 <span>{{ __('ui.stats.target') }}</span>
@@ -320,7 +320,7 @@
                             </div>
 
                             @forelse ($points->reverse()->take(160) as $point)
-                                <div wire:key="accuracy-point-detail-{{ $point->id }}" class="grid grid-cols-[8rem_8rem_6rem_9rem_9rem_9rem_9rem_7rem_7rem_8rem] gap-3 border-b border-white/5 px-4 py-3 text-sm">
+                                <div wire:key="accuracy-point-detail-{{ $point->id }}" class="workbench-table-row grid grid-cols-[8rem_8rem_6rem_9rem_9rem_9rem_9rem_7rem_7rem_8rem] gap-3 border-b border-white/5 px-4 py-3 text-sm">
                                     <span class="truncate text-zinc-400">{{ $point->target_open_time->format('m-d H:i') }}</span>
                                     <span class="truncate font-semibold text-white">{{ $point->source }}</span>
                                     <span class="truncate text-zinc-400">#{{ $point->crypto_forecast_id }} / {{ $point->step }}</span>
@@ -345,7 +345,7 @@
                         <span class="text-xs text-zinc-500">{{ $pendingPoints }}</span>
                     </div>
 
-                    <div class="overflow-x-auto">
+                    <div class="workbench-scroll overflow-x-auto">
                         <div class="min-w-[78rem]">
                             <div class="grid grid-cols-[8rem_8rem_6rem_9rem_9rem_18rem_8rem_8rem] gap-3 border-b border-white/10 px-4 py-2 text-xs font-semibold uppercase text-zinc-500">
                                 <span>{{ __('ui.stats.target') }}</span>
@@ -359,7 +359,7 @@
                             </div>
 
                             @forelse ($pendingPointRows->take(160) as $point)
-                                <div wire:key="pending-point-detail-{{ $point->id }}" class="grid grid-cols-[8rem_8rem_6rem_9rem_9rem_18rem_8rem_8rem] gap-3 border-b border-white/5 px-4 py-3 text-sm">
+                                <div wire:key="pending-point-detail-{{ $point->id }}" class="workbench-table-row grid grid-cols-[8rem_8rem_6rem_9rem_9rem_18rem_8rem_8rem] gap-3 border-b border-white/5 px-4 py-3 text-sm">
                                     <span class="truncate text-zinc-400">{{ $point->target_open_time->format('m-d H:i') }}</span>
                                     <span class="truncate font-semibold text-white">{{ $point->source }}</span>
                                     <span class="truncate text-zinc-400">#{{ $point->crypto_forecast_id }}</span>
@@ -382,7 +382,7 @@
                         <span class="text-xs text-zinc-500">{{ $forecasts->count() }}</span>
                     </div>
 
-                    <div class="overflow-x-auto">
+                    <div class="workbench-scroll overflow-x-auto">
                         <div class="min-w-[86rem]">
                             <div class="grid grid-cols-[6rem_8rem_7rem_10rem_10rem_12rem_12rem_10rem_8rem_8rem] gap-3 border-b border-white/10 px-4 py-2 text-xs font-semibold uppercase text-zinc-500">
                                 <span>{{ __('ui.stats.run') }}</span>
@@ -398,7 +398,7 @@
                             </div>
 
                             @forelse ($forecasts as $forecast)
-                                <div wire:key="forecast-run-detail-{{ $forecast->id }}" class="grid grid-cols-[6rem_8rem_7rem_10rem_10rem_12rem_12rem_10rem_8rem_8rem] gap-3 border-b border-white/5 px-4 py-3 text-sm">
+                                <div wire:key="forecast-run-detail-{{ $forecast->id }}" class="workbench-table-row grid grid-cols-[6rem_8rem_7rem_10rem_10rem_12rem_12rem_10rem_8rem_8rem] gap-3 border-b border-white/5 px-4 py-3 text-sm">
                                     <span class="truncate font-semibold text-white">#{{ $forecast->id }}</span>
                                     <span class="truncate text-zinc-200">{{ $forecast->source }}</span>
                                     <span class="truncate text-zinc-400">{{ $forecast->status }}</span>

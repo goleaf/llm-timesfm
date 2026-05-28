@@ -19,6 +19,7 @@ This project is built as a Livewire-only public application.
 - Keep import writes batched where possible so repeated public JSON updates do not become per-row query loops.
 - Keep chart interactivity data-driven: Livewire renders chart payload JSON, and browser JavaScript only handles pointer interaction.
 - Keep public UI text translated through the RU / EN language files. Russian is the default interface language, and the session switcher must stay available on public screens.
+- Keep public screens inside the shared workbench visual layer: wide, dense, scan-friendly, sticky-headed, and consistent across market, analysis, and statistics pages.
 
 ## End Of Prompt Checklist
 
@@ -54,6 +55,8 @@ Public analysis screens use interactive SVG charts where needed. Hovering a char
 The forecast statistics screen must stay information-dense. It should show market context, forecast totals, source coverage, engine-by-engine scoring, best and worst evaluated points, detailed evaluated rows, pending forecast targets, and run windows instead of only a small chart and a short list.
 
 The market dashboard is designed for Full HD use: a wide shell, pair finder, source-driven first-currency list with pin controls, pinned rates, main chart workspace with visible analyzer forecast points, live tick feed, prediction stake panel, and forecast desk. Avoid returning it to a narrow centered dashboard or visible raw payload panel.
+
+The public workbench uses shared dashboard styling for sticky headers, panel surfaces, chart areas, custom scroll regions, and hoverable data rows. New public Livewire screens should reuse this style instead of inventing a separate visual system.
 
 The public interface is Russian-first. All user-facing dashboard labels, action messages, chart payload labels, analysis pages, and statistics pages must have Russian and English strings. Do not hardcode new public copy in Livewire views or actions unless it is market data, a symbol, a technical abbreviation, or a user-entered value.
 

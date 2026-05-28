@@ -5,9 +5,9 @@
     $formatPercent = fn ($value) => $value === null ? __('ui.common.pending') : number_format((float) $value, 2).'%';
 @endphp
 
-<main wire:poll.visible.1000ms="refreshResults" class="min-h-screen bg-[#0b0d10] text-zinc-100">
-    <section class="mx-auto flex min-h-screen w-full max-w-[120rem] flex-col gap-5 px-4 py-5 sm:px-6 2xl:px-8">
-        <header class="flex flex-col gap-4 border-b border-white/10 pb-4 xl:flex-row xl:items-end xl:justify-between">
+<main wire:poll.visible.1000ms="refreshResults" class="crypto-workbench min-h-screen text-zinc-100">
+    <section class="workbench-container mx-auto flex min-h-screen w-full max-w-[120rem] flex-col gap-5 px-4 py-5 sm:px-6 2xl:px-8">
+        <header class="workbench-header flex flex-col gap-4 pb-4 xl:flex-row xl:items-end xl:justify-between">
             <div>
                 <p class="text-sm font-medium text-cyan-300">{{ __('ui.analysis.eyebrow') }}</p>
                 <h1 class="mt-1 text-3xl font-semibold tracking-normal text-white sm:text-4xl">{{ __('ui.analysis.title') }}</h1>
@@ -41,7 +41,7 @@
                     <span class="text-xs text-zinc-500">{{ $assets->count() }}</span>
                 </div>
 
-                <div class="max-h-[calc(100vh-11rem)] overflow-y-auto">
+                <div class="workbench-scroll max-h-[calc(100vh-11rem)] overflow-y-auto">
                     @forelse ($assets as $asset)
                         @php
                             $isSelected = $selectedAsset?->is($asset);
@@ -139,9 +139,9 @@
                             <span class="text-xs text-zinc-500">{{ $evaluatedPoints->count() }}</span>
                         </div>
 
-                        <div class="max-h-[34rem] overflow-auto">
+                        <div class="workbench-scroll max-h-[34rem] overflow-auto">
                             @forelse ($evaluatedPoints as $point)
-                                <div wire:key="analysis-point-{{ $point->id }}" class="grid grid-cols-[6rem_minmax(0,1fr)_minmax(0,1fr)_5rem] gap-3 border-b border-white/5 px-4 py-3 text-sm">
+                                <div wire:key="analysis-point-{{ $point->id }}" class="workbench-table-row grid grid-cols-[6rem_minmax(0,1fr)_minmax(0,1fr)_5rem] gap-3 border-b border-white/5 px-4 py-3 text-sm">
                                     <span class="text-xs text-zinc-500">{{ $point->target_open_time->format('M d H:i') }}</span>
                                     <span class="min-w-0">
                                         <span class="block truncate font-semibold text-white">{{ $point->source }}</span>
@@ -167,9 +167,9 @@
                             <span class="text-xs text-zinc-500">{{ $forecasts->count() }}</span>
                         </div>
 
-                        <div class="max-h-[34rem] overflow-auto">
+                        <div class="workbench-scroll max-h-[34rem] overflow-auto">
                             @forelse ($forecasts as $forecast)
-                                <div wire:key="analysis-run-{{ $forecast->id }}" class="border-b border-white/5 px-4 py-3">
+                                <div wire:key="analysis-run-{{ $forecast->id }}" class="workbench-table-row border-b border-white/5 px-4 py-3">
                                     <div class="flex items-center justify-between gap-3">
                                         <p class="truncate text-sm font-semibold text-white">#{{ $forecast->id }} / {{ $forecast->source }}</p>
                                         <p class="text-xs text-zinc-500">{{ $forecast->completed_at?->format('M d H:i') }}</p>

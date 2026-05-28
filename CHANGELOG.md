@@ -4,6 +4,7 @@ This file is the human-readable history of the project. It must be updated after
 
 ## 2026-05-28
 
+- Redesigned the public market, analysis, and statistics screens into one shared workbench interface with sticky headers, layered dashboard backgrounds, stronger chart surfaces, consistent scroll areas, and clearer hoverable data rows.
 - Expanded the forecast statistics screen so it now shows market context, more accuracy totals, engine-by-engine scoring, best and worst forecast points, detailed evaluated points, pending forecast targets, and full forecast-run details.
 - Translated the public dashboard system to Russian by default and added a persistent RU / EN language switcher for switching the same Livewire screens to English.
 - Added chart zoom controls with zoom in, zoom out, reset, mouse-wheel zoom, drag panning, and Livewire-safe zoom state for the market graph.

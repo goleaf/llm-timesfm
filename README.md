@@ -13,7 +13,8 @@ Public repository: `https://github.com/goleaf/llm-timesfm`
 - Shows real-time Livewire screens without page reloads.
 - Shows Russian by default and includes a persistent RU / EN switcher for English.
 - Shows interactive SVG charts with zoom controls, wheel zoom, drag panning, always-visible scale labels, latest markers, analyzer labels, metric panels, point ledgers, and hover tooltips for deeper candle, live price, forecast, and forecast-accuracy details.
-- Uses a wide Full HD dashboard layout with a source-driven first-currency list, pair finder, pinned rates, chart workspace, visible analysis points, live tick feed, prediction stake panel, and forecast desk.
+- Uses a shared workbench interface for all public screens with sticky headers, dense panels, styled chart surfaces, consistent scroll areas, hoverable data rows, and a wide Full HD layout.
+- The market workspace includes a source-driven first-currency list, pair finder, pinned rates, chart workspace, visible analysis points, live tick feed, prediction stake panel, and forecast desk.
 - Runs scheduled automation for market updates, missing candle backfill, forecast creation, and forecast evaluation.
 - Keeps the project open: no login, no user accounts, no private panels.
 - Keeps public pages as full-page Livewire components. Volt and standard controllers are intentionally not used.
@@ -57,6 +58,7 @@ The scheduled automation keeps the local SQLite database fresh:
 - Pair Finder searches by first and second currency, and the First currency field shows a live list from stored source data with direct pin controls for the best matching pair.
 - Pinned rates can be added or removed directly from the dashboard and are remembered for the current browser session.
 - The interface is Russian-first, and the floating RU / EN switcher changes the current browser session without requiring accounts or a reload-heavy settings page.
+- The public screens share the same workbench visual layer so market, analysis, and statistics pages feel like one dashboard instead of separate narrow pages.
 - Automatic analysis engines draw their forecast points on the market graph and are scored later against real candles.
 - The chart keeps scale values, latest price, analyzer endpoints, engine metrics, and the visible point ledger on screen while hover tooltips and zoom controls remain available.
 - Prediction Stake saves a user-entered target time, target price, direction, confidence, and note for the selected market.
