@@ -13,6 +13,8 @@ This project is built as a Livewire-only public application.
 - Keep the application open; do not add auth, accounts, roles, private panels, or password reset.
 - Keep automation in Artisan commands and Laravel Scheduler.
 - Keep all Markdown files aligned with the actual project state.
+- Keep incoming route, Livewire action, and Artisan command parameters in request objects before they reach workflows.
+- Keep workflow behavior in action classes. Livewire components and Artisan commands should collect request data, call actions, and render/report the result.
 - Keep real-time reads behind short-lived cache actions instead of rebuilding the same dashboard queries in Livewire.
 - Keep import writes batched where possible so repeated public JSON updates do not become per-row query loops.
 - Keep chart interactivity data-driven: Livewire renders chart payload JSON, and browser JavaScript only handles pointer interaction.

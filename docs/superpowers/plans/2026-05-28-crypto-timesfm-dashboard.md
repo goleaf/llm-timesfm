@@ -89,3 +89,10 @@
 - [x] Split the market dashboard into market list, chart workspace, and JSON inspector columns.
 - [x] Replace the narrow raw JSON history block with structured snapshot sections.
 - [x] Keep raw fields and raw JSON available for inspection without making them the primary view.
+
+### Task 12: Request And Action Architecture
+
+- [x] Move incoming dashboard and command parameters into validated request objects.
+- [x] Move market history loading and forecast-button behavior out of Livewire and into actions.
+- [x] Move command orchestration for syncs, backfills, forecast cycles, and watch loops into actions.
+- [x] Add tests that verify invalid dashboard input is ignored and command payloads are validated before actions run.

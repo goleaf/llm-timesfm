@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Actions\Crypto\FillMissingCryptoCandlesAction;
+use App\Http\Requests\Crypto\FillMissingCryptoCandlesRequest;
 use Illuminate\Console\Command;
 
 class FillMissingCryptoCandlesCommand extends Command
@@ -16,12 +17,15 @@ class FillMissingCryptoCandlesCommand extends Command
 
     public function handle(FillMissingCryptoCandlesAction $fillMissing): int
     {
-        $symbol = $this->argument('symbol');
-        $intervals = array_values(array_filter((array) $this->option('interval')));
+        $request = FillMissingCryptoCandlesRequest::fromConsole(
+            $this->argument('symbol'),
+            $this->option('interval'),
+            $this->option('window'),
+        );
         $summary = $fillMissing->handle(
-            $symbol ? [(string) $symbol] : null,
-            $intervals === [] ? null : $intervals,
-            (int) $this->option('window'),
+            $request->symbols,
+            $request->intervals,
+            $request->window,
         );
 
         $this->info(

@@ -4,9 +4,8 @@ namespace App\Livewire;
 
 use App\Actions\Crypto\BuildForecastAccuracySeriesAction;
 use App\Actions\Crypto\ReadForecastStatsDashboardAction;
-use App\Models\CryptoAsset;
+use App\Http\Requests\Crypto\ForecastStatsDashboardRequest;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -20,16 +19,15 @@ class ForecastStatsDashboard extends Component
     /**
      * @var array<string, string>
      */
-    public array $intervalOptions = [
-        '1m' => '1m',
-        '5m' => '5m',
-        '15m' => '15m',
-        '1h' => '1h',
-    ];
+    public array $intervalOptions = [];
 
     public function mount(?string $symbol = null): void
     {
-        $this->selectedSymbol = strtoupper($symbol ?: $this->selectedSymbol);
+        $request = ForecastStatsDashboardRequest::fromRoute($symbol);
+
+        $this->selectedSymbol = $request->symbol;
+        $this->interval = $request->interval;
+        $this->intervalOptions = ForecastStatsDashboardRequest::intervalOptions();
     }
 
     public function refreshStats(): void
@@ -39,21 +37,30 @@ class ForecastStatsDashboard extends Component
 
     public function selectAsset(string $symbol): void
     {
-        $this->selectedSymbol = strtoupper($symbol);
+        $request = $this->dashboardRequest()->withSymbol($symbol);
+
+        if (! $request) {
+            return;
+        }
+
+        $this->selectedSymbol = $request->symbol;
     }
 
     public function setInterval(string $interval): void
     {
-        if (! array_key_exists($interval, $this->intervalOptions)) {
+        $request = $this->dashboardRequest()->withInterval($interval);
+
+        if (! $request) {
             return;
         }
 
-        $this->interval = $interval;
+        $this->interval = $request->interval;
     }
 
     public function render(BuildForecastAccuracySeriesAction $chartBuilder, ReadForecastStatsDashboardAction $reader): View
     {
-        $dashboard = $reader->handle($this->selectedSymbol, $this->interval);
+        $request = $this->dashboardRequest();
+        $dashboard = $reader->handle($request->symbol, $request->interval);
         $selectedAsset = $dashboard['selectedAsset'];
 
         if ($selectedAsset && $this->selectedSymbol !== $selectedAsset->symbol) {
@@ -71,10 +78,8 @@ class ForecastStatsDashboard extends Component
         ]);
     }
 
-    private function selectedAssetQuery(): Builder
+    private function dashboardRequest(): ForecastStatsDashboardRequest
     {
-        return CryptoAsset::query()
-            ->forSymbol($this->selectedSymbol)
-            ->withLatestSnapshot();
+        return ForecastStatsDashboardRequest::fromState($this->selectedSymbol, $this->interval);
     }
 }

@@ -2,12 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Actions\Crypto\FillMissingCryptoCandlesAction;
-use App\Actions\Crypto\RunTimesFmForecastAction;
-use App\Models\CryptoAsset;
-use App\Models\CryptoForecast;
+use App\Actions\Crypto\RunCryptoForecastCycleAction;
+use App\Http\Requests\Crypto\RunCryptoForecastCycleRequest;
 use Illuminate\Console\Command;
-use Throwable;
 
 class RunCryptoForecastCycleCommand extends Command
 {
@@ -18,57 +15,24 @@ class RunCryptoForecastCycleCommand extends Command
 
     protected $description = 'Run a lightweight forecast cycle for top crypto assets and store forecast points for later scoring.';
 
-    public function handle(FillMissingCryptoCandlesAction $fillMissing, RunTimesFmForecastAction $forecasts): int
+    public function handle(RunCryptoForecastCycleAction $cycle): int
     {
-        $period = (string) $this->argument('period');
-        $settings = config("crypto.forecasting.periods.{$period}");
+        $request = RunCryptoForecastCycleRequest::fromConsole(
+            $this->argument('period'),
+            $this->option('limit'),
+            $this->option('fresh-minutes'),
+        );
+        $summary = $cycle->handle(
+            $request,
+            function (string $message): void {
+                $this->line($message);
+            },
+            function (string $message): void {
+                $this->warn($message);
+            },
+        );
 
-        if (! is_array($settings)) {
-            $this->error("Unknown forecast period [{$period}].");
-
-            return self::FAILURE;
-        }
-
-        $assets = CryptoAsset::query()
-            ->dashboardList((int) $this->option('limit'))
-            ->get();
-        $stored = 0;
-
-        foreach ($assets as $asset) {
-            $latest = CryptoForecast::query()
-                ->forAsset($asset)
-                ->forInterval((string) $settings['interval'])
-                ->completed()
-                ->where('completed_at', '>=', now()->subMinutes((int) $this->option('fresh-minutes')))
-                ->orderByDesc('completed_at')
-                ->first();
-
-            if ($latest) {
-                continue;
-            }
-
-            try {
-                $fillMissing->handle(
-                    [$asset->symbol],
-                    [(string) $settings['interval']],
-                    (int) $settings['context'],
-                );
-
-                $forecast = $forecasts->handle(
-                    $asset,
-                    (string) $settings['interval'],
-                    (int) $settings['horizon'],
-                    (int) $settings['context'],
-                );
-
-                $this->line("Stored forecast #{$forecast->getKey()} for {$asset->symbol}.");
-                $stored++;
-            } catch (Throwable $exception) {
-                $this->warn("{$asset->symbol}: {$exception->getMessage()}");
-            }
-        }
-
-        $this->info("Stored {$stored} new {$period} forecasts.");
+        $this->info("Stored {$summary['stored']} new {$summary['period']} forecasts.");
 
         return self::SUCCESS;
     }

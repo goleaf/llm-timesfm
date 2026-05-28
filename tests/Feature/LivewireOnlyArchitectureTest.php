@@ -31,3 +31,19 @@ it('keeps public pages in full page livewire components without app controllers 
         ->and(Route::has('register'))->toBeFalse()
         ->and(class_exists('Livewire\Volt\Volt'))->toBeFalse();
 });
+
+it('keeps livewire components and commands behind request and action layers', function (): void {
+    $entrypointFiles = collect(Finder::create()
+        ->files()
+        ->in([app_path('Livewire'), app_path('Console/Commands')])
+        ->name('*.php'));
+
+    $violations = $entrypointFiles
+        ->mapWithKeys(fn (SplFileInfo $file): array => [$file->getRelativePathname() => $file->getContents()])
+        ->filter(fn (string $contents): bool => str_contains($contents, '::query(')
+            || str_contains($contents, 'use App\\Models\\'))
+        ->keys()
+        ->values();
+
+    expect($violations->all())->toBe([]);
+});

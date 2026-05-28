@@ -55,6 +55,12 @@ it('renders the realtime markets dashboard from stored market data', function ()
     Livewire::test(MarketsDashboard::class)
         ->call('selectAsset', $asset->symbol)
         ->assertSet('selectedSymbol', 'BTCUSDT')
+        ->call('setInterval', '2h')
+        ->assertSet('interval', '1m')
+        ->call('setForecastPeriod', '7d')
+        ->assertSet('forecastPeriod', '1h')
+        ->call('selectAsset', 'bad-symbol!')
+        ->assertSet('selectedSymbol', 'BTCUSDT')
         ->assertSee('71,000.50')
         ->assertSee('Structured JSON History');
 });

@@ -14,6 +14,7 @@ Public repository: `https://github.com/goleaf/llm-timesfm`
 - Runs scheduled automation for market updates, missing candle backfill, forecast creation, and forecast evaluation.
 - Keeps the project open: no login, no user accounts, no private panels.
 - Keeps public pages as full-page Livewire components. Volt and standard controllers are intentionally not used.
+- Keeps input handling and workflow orchestration separated: request objects validate incoming symbols, intervals, limits, and forecast periods, while action classes perform market loading, forecasting, syncing, and cache warming.
 
 ## Local URLs
 
@@ -84,6 +85,8 @@ Core rules:
 - Never use Volt.
 - No application controllers for public pages.
 - No traditional Blade pages.
+- Validate incoming Livewire route, Livewire action, and Artisan command data through request objects before running workflows.
+- Keep workflow logic in actions; Livewire components and Artisan commands should stay thin.
 - No authentication or user account system.
 - Update `CHANGELOG.md`, commit, and push after every completed prompt.
 - Keep all Markdown files synchronized with current project behavior.

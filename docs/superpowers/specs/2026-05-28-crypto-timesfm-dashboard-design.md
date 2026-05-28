@@ -8,6 +8,8 @@ Build a Laravel 13 and Livewire 4 dashboard that polls popular Binance Spot USDT
 
 Laravel owns the UI, database, scheduler, commands, and orchestration. Binance data enters through Eloquent-backed actions, not from Blade templates. Full-page Livewire components poll the local database while the scheduler refreshes snapshots, fills missing short candles, creates forecasts, and evaluates forecast accuracy.
 
+Incoming route symbols, Livewire action values, and Artisan command options are normalized through request objects before workflows run. Livewire components and commands are intentionally thin: they collect input, build a request object, call an action, and render or print the result. Market loading, forecast runs, syncs, backfills, forecast cycles, and watch loops belong in action classes.
+
 TimesFM runs outside PHP through `python/timesfm_forecast.py`. The Laravel action sends close-price history as JSON over stdin and stores the returned forecast payload. When the Python environment or model is not installed, the bridge returns a baseline last-value forecast so the UI remains usable on an 8 GB M1 laptop.
 
 The project is public and Livewire-only. It intentionally has no authentication system, user account model, private panel, standard public controller, traditional public Blade page, or Volt component.
@@ -30,6 +32,7 @@ The market screen targets Full HD workstations. It uses a wide shell with a left
 8. Cache warming prepares the most common market and statistics reads after ticker updates.
 9. Chart hover payloads expose detailed candle, live ticker, forecast, actual, and error values without querying from Blade.
 10. The JSON history builder converts raw ticker payloads into grouped inspector rows before they reach the Livewire view.
+11. Request objects validate symbols, intervals, forecast periods, limits, and watch windows before the related action is called.
 
 ## Constraints
 
@@ -40,6 +43,7 @@ The market screen targets Full HD workstations. It uses a wide shell with a left
 - Binance is the first data source because it supports public market JSON and one-second update patterns.
 - TimesFM can run through the local Python environment, with baseline fallback when disabled.
 - No auth, users, private panels, Volt, public controllers, or traditional public Blade pages.
+- Livewire components and Artisan commands should not own workflow logic; they should hand validated request data to actions.
 - Realtime reads should use cache actions with short TTLs and explicit invalidation after market writes.
 - Growing market tables need composite indexes that match actual Eloquent filters and sort order.
 - Full HD layout should stay wide and data-dense; do not compress the dashboard back into a narrow centered column.

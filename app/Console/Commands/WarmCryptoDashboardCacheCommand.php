@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Actions\Crypto\WarmCryptoDashboardCacheAction;
+use App\Http\Requests\Crypto\WarmCryptoDashboardCacheRequest;
 use Illuminate\Console\Command;
 
 class WarmCryptoDashboardCacheCommand extends Command
@@ -16,12 +17,15 @@ class WarmCryptoDashboardCacheCommand extends Command
 
     public function handle(WarmCryptoDashboardCacheAction $cache): int
     {
-        $symbols = array_values(array_filter((array) $this->option('symbol')));
-        $intervals = array_values(array_filter((array) $this->option('interval')));
+        $request = WarmCryptoDashboardCacheRequest::fromConsole(
+            $this->option('symbol'),
+            $this->option('interval'),
+            $this->option('limit'),
+        );
         $summary = $cache->handle(
-            $symbols === [] ? null : $symbols,
-            $intervals === [] ? null : $intervals,
-            (int) $this->option('limit'),
+            $request->symbols,
+            $request->intervals,
+            $request->limit,
         );
 
         $this->info(

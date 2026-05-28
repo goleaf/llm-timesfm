@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Actions\Crypto\EvaluateForecastAccuracyAction;
+use App\Http\Requests\Crypto\EvaluateCryptoForecastsRequest;
 use Illuminate\Console\Command;
 
 class EvaluateCryptoForecastsCommand extends Command
@@ -13,7 +14,8 @@ class EvaluateCryptoForecastsCommand extends Command
 
     public function handle(EvaluateForecastAccuracyAction $accuracy): int
     {
-        $summary = $accuracy->handle((int) $this->option('limit'));
+        $request = EvaluateCryptoForecastsRequest::fromConsole($this->option('limit'));
+        $summary = $accuracy->handle($request->limit);
 
         $this->info("Evaluated {$summary['points']} forecast points across {$summary['forecasts']} forecasts.");
 

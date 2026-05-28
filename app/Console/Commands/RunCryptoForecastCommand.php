@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Actions\Crypto\RunTimesFmForecastAction;
-use App\Models\CryptoAsset;
+use App\Actions\Crypto\RunConfiguredCryptoForecastAction;
+use App\Http\Requests\Crypto\RunCryptoForecastRequest;
 use Illuminate\Console\Command;
 
 class RunCryptoForecastCommand extends Command
@@ -12,29 +12,15 @@ class RunCryptoForecastCommand extends Command
 
     protected $description = 'Run a forecast for a crypto symbol using TimesFM when enabled.';
 
-    public function handle(RunTimesFmForecastAction $forecasts): int
+    public function handle(RunConfiguredCryptoForecastAction $forecasts): int
     {
-        $period = (string) $this->argument('period');
-        $settings = config("crypto.forecasting.periods.{$period}");
-
-        if (! is_array($settings)) {
-            $this->error("Unknown forecast period [{$period}].");
-
-            return self::FAILURE;
-        }
-
-        $asset = CryptoAsset::query()
-            ->forSymbol((string) $this->argument('symbol'))
-            ->firstOrFail();
-
-        $forecast = $forecasts->handle(
-            $asset,
-            (string) $settings['interval'],
-            (int) $settings['horizon'],
-            (int) $settings['context'],
+        $request = RunCryptoForecastRequest::fromConsole(
+            $this->argument('symbol'),
+            $this->argument('period'),
         );
+        $forecast = $forecasts->handle($request);
 
-        $this->info("Stored {$forecast->source} forecast #{$forecast->getKey()} for {$asset->symbol}.");
+        $this->info("Stored {$forecast->source} forecast #{$forecast->getKey()} for {$request->symbol}.");
 
         return self::SUCCESS;
     }

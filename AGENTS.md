@@ -16,6 +16,8 @@ This is an open, public, fully automated Laravel project.
 - Keep Binance and TimesFM integrations public-source only, configured through `.env` and `config/crypto.php`.
 - Automation must run through Artisan commands and Laravel Scheduler, not queue workers.
 - Use Eloquent models and actions for data access. Do not query in Blade.
+- Validate route parameters, Livewire action values, and Artisan command options through request objects before running workflows.
+- Keep Livewire components and Artisan commands thin: they may collect input, build request objects, call actions, and render or print results, but workflow behavior belongs in action classes.
 - Keep real-time dashboard reads in action classes with short-lived cache and explicit invalidation.
 - Add composite indexes for new high-frequency filters or sort orders before relying on them in polling screens.
 - Prefer bulk Eloquent upserts for repeated public JSON imports.

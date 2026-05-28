@@ -21,10 +21,13 @@
 - [x] Push the public repository on `main`.
 - [x] Keep realtime Livewire screens backed by short-lived cache actions and cache warming.
 - [x] Keep database growth safe with composite indexes and duplicate-safe bulk imports.
+- [x] Keep route, Livewire action, and command inputs validated through request objects before workflows run.
+- [x] Keep user-interface and command classes thin by moving workflow behavior into actions.
 
 ## Guard Rails
 
 - Architecture tests must fail if login, registration, user tables, Volt, public controllers, or non-Livewire public Blade screens return.
 - The changelog must stay readable for a project owner, not written as a code diff.
 - Automation must stay scheduler-driven so the project can run unattended.
+- Entry points must validate input through request objects and delegate behavior to actions.
 - Performance changes must keep data access in actions/models, never in Blade, and must include tests for cache or index behavior.

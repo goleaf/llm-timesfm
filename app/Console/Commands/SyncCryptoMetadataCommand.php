@@ -2,7 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Actions\Crypto\FetchBinanceExchangeInfoAction;
+use App\Actions\Crypto\SyncConfiguredCryptoMetadataAction;
+use App\Http\Requests\Crypto\SyncCryptoMetadataRequest;
 use Illuminate\Console\Command;
 
 class SyncCryptoMetadataCommand extends Command
@@ -11,10 +12,10 @@ class SyncCryptoMetadataCommand extends Command
 
     protected $description = 'Fetch Binance exchangeInfo metadata for configured crypto symbols.';
 
-    public function handle(FetchBinanceExchangeInfoAction $metadata): int
+    public function handle(SyncConfiguredCryptoMetadataAction $metadata): int
     {
-        $symbols = array_slice(config('crypto.binance.symbols', []), 0, (int) $this->option('limit'));
-        $summary = $metadata->handle($symbols);
+        $request = SyncCryptoMetadataRequest::fromConsole($this->option('limit'));
+        $summary = $metadata->handle($request);
 
         $this->info("Stored metadata for {$summary['assets']} crypto assets.");
 

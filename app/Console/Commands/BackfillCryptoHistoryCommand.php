@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Actions\Crypto\FetchBinanceKlinesAction;
-use App\Models\CryptoAsset;
+use App\Actions\Crypto\BackfillCryptoHistoryAction;
+use App\Http\Requests\Crypto\BackfillCryptoHistoryRequest;
 use Illuminate\Console\Command;
 
 class BackfillCryptoHistoryCommand extends Command
@@ -12,19 +12,16 @@ class BackfillCryptoHistoryCommand extends Command
 
     protected $description = 'Fetch recent Binance kline history for one symbol or the active dashboard symbols.';
 
-    public function handle(FetchBinanceKlinesAction $klines): int
+    public function handle(BackfillCryptoHistoryAction $backfill): int
     {
-        $symbol = $this->argument('symbol');
-        $interval = (string) $this->option('interval');
-        $limit = (int) $this->option('limit');
+        $request = BackfillCryptoHistoryRequest::fromConsole(
+            $this->argument('symbol'),
+            $this->option('interval'),
+            $this->option('limit'),
+        );
 
-        $assets = $symbol
-            ? CryptoAsset::query()->forSymbol((string) $symbol)->limit(1)->get()
-            : CryptoAsset::query()->dashboardList(20)->get();
-
-        foreach ($assets as $asset) {
-            $stored = $klines->handle($asset, $interval, $limit);
-            $this->line("Stored {$stored} {$interval} candles for {$asset->symbol}.");
+        foreach ($backfill->handle($request) as $result) {
+            $this->line("Stored {$result['stored']} {$result['interval']} candles for {$result['symbol']}.");
         }
 
         return self::SUCCESS;

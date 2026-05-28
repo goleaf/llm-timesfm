@@ -4,13 +4,12 @@ namespace App\Livewire;
 
 use App\Actions\Crypto\BuildMarketSeriesAction;
 use App\Actions\Crypto\BuildSnapshotHistoryRowsAction;
-use App\Actions\Crypto\FillMissingCryptoCandlesAction;
+use App\Actions\Crypto\EnsureMarketHistoryAction;
+use App\Actions\Crypto\LoadMarketHistoryAction;
 use App\Actions\Crypto\ReadMarketsDashboardAction;
-use App\Actions\Crypto\RunTimesFmForecastAction;
-use App\Models\CryptoAsset;
-use App\Models\CryptoCandle;
+use App\Actions\Crypto\RunMarketForecastAction;
+use App\Http\Requests\Crypto\MarketsDashboardRequest;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Throwable;
@@ -29,27 +28,22 @@ class MarketsDashboard extends Component
     /**
      * @var array<string, string>
      */
-    public array $intervalOptions = [
-        '1m' => '1m',
-        '5m' => '5m',
-        '15m' => '15m',
-        '1h' => '1h',
-        '1d' => '1d',
-    ];
+    public array $intervalOptions = [];
 
     /**
      * @var array<string, string>
      */
-    public array $forecastOptions = [
-        '15m' => '15m',
-        '1h' => '1h',
-        '4h' => '4h',
-        '24h' => '24h',
-    ];
+    public array $forecastOptions = [];
 
     public function mount(?string $symbol = null): void
     {
-        $this->selectedSymbol = strtoupper($symbol ?: $this->selectedSymbol);
+        $request = MarketsDashboardRequest::fromRoute($symbol);
+
+        $this->selectedSymbol = $request->symbol;
+        $this->interval = $request->interval;
+        $this->forecastPeriod = $request->forecastPeriod;
+        $this->intervalOptions = MarketsDashboardRequest::intervalOptions();
+        $this->forecastOptions = MarketsDashboardRequest::forecastOptions();
     }
 
     public function refreshMarket(): void
@@ -59,76 +53,56 @@ class MarketsDashboard extends Component
 
     public function selectAsset(string $symbol): void
     {
-        $this->selectedSymbol = strtoupper($symbol);
+        $request = $this->dashboardRequest()->withSymbol($symbol);
+
+        if (! $request) {
+            return;
+        }
+
+        $this->selectedSymbol = $request->symbol;
         $this->notice = null;
-        $this->loadHistoryIfMissing();
+        $this->loadHistoryIfMissing($request);
     }
 
     public function setInterval(string $interval): void
     {
-        if (! array_key_exists($interval, $this->intervalOptions)) {
+        $request = $this->dashboardRequest()->withInterval($interval);
+
+        if (! $request) {
             return;
         }
 
-        $this->interval = $interval;
-        $this->loadHistoryIfMissing();
+        $this->interval = $request->interval;
+        $this->loadHistoryIfMissing($request);
     }
 
     public function setForecastPeriod(string $period): void
     {
-        if (! array_key_exists($period, $this->forecastOptions)) {
+        $request = $this->dashboardRequest()->withForecastPeriod($period);
+
+        if (! $request) {
             return;
         }
 
-        $this->forecastPeriod = $period;
+        $this->forecastPeriod = $request->forecastPeriod;
     }
 
     public function loadHistory(): void
     {
-        $asset = $this->selectedAssetQuery()->first();
-
-        if (! $asset) {
-            $this->notice = 'Market data is not loaded yet.';
-
-            return;
+        try {
+            $this->notice = app(LoadMarketHistoryAction::class)->handle($this->dashboardRequest());
+        } catch (Throwable $exception) {
+            $this->notice = $exception->getMessage();
         }
-
-        app(FillMissingCryptoCandlesAction::class)->handle(
-            [$asset->symbol],
-            [$this->interval],
-            (int) config('crypto.binance.history_limit'),
-        );
-
-        $this->notice = "History loaded for {$asset->symbol}.";
     }
 
     public function runForecast(): void
     {
-        $settings = config("crypto.forecasting.periods.{$this->forecastPeriod}");
-        $asset = $this->selectedAssetQuery()->first();
-
-        if (! $asset || ! is_array($settings)) {
-            $this->notice = 'Forecast is not available for this selection.';
-
-            return;
-        }
-
         try {
-            app(FillMissingCryptoCandlesAction::class)->handle(
-                [$asset->symbol],
-                [(string) $settings['interval']],
-                (int) $settings['context'],
-            );
+            $result = app(RunMarketForecastAction::class)->handle($this->dashboardRequest());
 
-            $forecast = app(RunTimesFmForecastAction::class)->handle(
-                $asset,
-                (string) $settings['interval'],
-                (int) $settings['horizon'],
-                (int) $settings['context'],
-            );
-
-            $this->interval = (string) $settings['interval'];
-            $this->notice = "Forecast #{$forecast->getKey()} stored.";
+            $this->interval = $result['interval'];
+            $this->notice = $result['message'];
         } catch (Throwable $exception) {
             $this->notice = $exception->getMessage();
         }
@@ -139,7 +113,8 @@ class MarketsDashboard extends Component
         BuildSnapshotHistoryRowsAction $snapshotRows,
         ReadMarketsDashboardAction $reader,
     ): View {
-        $dashboard = $reader->handle($this->selectedSymbol, $this->interval);
+        $request = $this->dashboardRequest();
+        $dashboard = $reader->handle($request->symbol, $request->interval);
         $selectedAsset = $dashboard['selectedAsset'];
 
         if ($selectedAsset && $this->selectedSymbol !== $selectedAsset->symbol) {
@@ -157,38 +132,17 @@ class MarketsDashboard extends Component
         ]);
     }
 
-    private function loadHistoryIfMissing(): void
+    private function dashboardRequest(): MarketsDashboardRequest
     {
-        $asset = $this->selectedAssetQuery()->first();
+        return MarketsDashboardRequest::fromState($this->selectedSymbol, $this->interval, $this->forecastPeriod);
+    }
 
-        if (! $asset) {
-            return;
-        }
-
-        $exists = CryptoCandle::query()
-            ->forAsset($asset)
-            ->forInterval($this->interval)
-            ->exists();
-
-        if ($exists) {
-            return;
-        }
-
+    private function loadHistoryIfMissing(MarketsDashboardRequest $request): void
+    {
         try {
-            app(FillMissingCryptoCandlesAction::class)->handle(
-                [$asset->symbol],
-                [$this->interval],
-                (int) config('crypto.binance.history_limit'),
-            );
+            app(EnsureMarketHistoryAction::class)->handle($request);
         } catch (Throwable $exception) {
             $this->notice = $exception->getMessage();
         }
-    }
-
-    private function selectedAssetQuery(): Builder
-    {
-        return CryptoAsset::query()
-            ->forSymbol($this->selectedSymbol)
-            ->withLatestSnapshot();
     }
 }
