@@ -22,6 +22,8 @@ The market screen targets Full HD workstations. It uses a wide shell with a left
 
 The left market list includes compact movement charts for visible pairs. Those mini charts are built from action-prepared latest snapshot fields and rendered as small SVGs beside the existing live price, update time, and change values.
 
+The Live Ticks block uses prepared tick rows from stored snapshot data. It must display stable, useful market fields such as latest price, tick movement, 24-hour range, compact quote volume, and trade count, and it must not render missing bid or ask fields as zeroes.
+
 The forecast statistics screen is a full diagnostic surface, not a small summary. It shows market context, source counts, coverage, MAPE, MAE, direction accuracy, engine breakdowns, ranked best and worst points, evaluated point details, pending target rows, and forecast-run windows from preloaded action data.
 
 All public dashboard screens share a workbench visual layer. The market, analysis, and statistics pages use the same sticky header treatment, dense panel surfaces, chart framing, custom scroll regions, hoverable data rows, and wide monitor spacing so the application reads as one operational tool.

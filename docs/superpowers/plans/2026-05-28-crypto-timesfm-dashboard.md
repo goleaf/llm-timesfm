@@ -133,3 +133,9 @@
 - [x] Add compact movement charts to the left market list beside each visible pair's live price and 24-hour change.
 - [x] Build mini chart payloads in `BuildMarketBoardAction` from already loaded latest snapshot data.
 - [x] Render mini charts as lightweight SVG in Livewire without Blade queries or extra per-row database reads.
+
+### Task 18: Live Tick Readability
+
+- [x] Replace raw bid and ask display in Live Ticks with action-prepared tick rows.
+- [x] Show latest price, tick movement, high and low range, compact quote volume, and trade count.
+- [x] Avoid rendering missing source fields as zero values in the dashboard.

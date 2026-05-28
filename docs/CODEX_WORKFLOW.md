@@ -58,6 +58,8 @@ The market dashboard is designed for Full HD use: a wide shell, pair finder, sou
 
 The left market list should keep compact movement charts on visible market rows. Build their chart payload in actions from already loaded market data, then render SVG in Livewire without Blade-side calculations or extra row queries.
 
+The Live Ticks block should show action-prepared tick rows, not raw model fields. If a source omits bid or ask, show available price movement, range, volume, and trade-count data instead of rendering null values as zeroes.
+
 The public workbench uses shared dashboard styling for sticky headers, panel surfaces, chart areas, custom scroll regions, and hoverable data rows. New public Livewire screens should reuse this style instead of inventing a separate visual system.
 
 The public interface is Russian-first. All user-facing dashboard labels, action messages, chart payload labels, analysis pages, and statistics pages must have Russian and English strings. Do not hardcode new public copy in Livewire views or actions unless it is market data, a symbol, a technical abbreviation, or a user-entered value.

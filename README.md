@@ -16,6 +16,7 @@ Public repository: `https://github.com/goleaf/llm-timesfm`
 - Uses a shared workbench interface for all public screens with sticky headers, dense panels, styled chart surfaces, consistent scroll areas, hoverable data rows, and a wide Full HD layout.
 - The market workspace includes a source-driven first-currency list, pair finder, pinned rates, chart workspace, visible analysis points, live tick feed, prediction stake panel, and forecast desk.
 - The left market list shows a mini movement chart for each visible pair beside its live price, update time, and 24-hour change.
+- Live Ticks show normal market fields: latest price, tick movement, 24-hour high and low, compact quote volume, and trade count instead of empty bid and ask placeholders.
 - Runs scheduled automation for market updates, missing candle backfill, forecast creation, and forecast evaluation.
 - Keeps the project open: no login, no user accounts, no private panels.
 - Keeps public pages as full-page Livewire components. Volt and standard controllers are intentionally not used.
@@ -63,6 +64,7 @@ The scheduled automation keeps the local SQLite database fresh:
 - The public screens share the same workbench visual layer so market, analysis, and statistics pages feel like one dashboard instead of separate narrow pages.
 - Automatic analysis engines draw their forecast points on the market graph and are scored later against real candles.
 - The chart keeps scale values, latest price, analyzer endpoints, engine metrics, and the visible point ledger on screen while hover tooltips and zoom controls remain available.
+- Live tick rows avoid raw empty feed fields; if the source does not provide bid and ask, the interface uses available range, volume, trade count, and tick movement data.
 - Prediction Stake saves a user-entered target time, target price, direction, confidence, and note for the selected market.
 - The visible interface shows market rows, live ticks, charts, pinned rates, and forecasts; raw payload blocks are not shown on the screen.
 

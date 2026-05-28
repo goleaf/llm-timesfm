@@ -59,6 +59,8 @@ return [
         'live_ticks' => 'Live тики',
         'updates' => 'обновлений: :count',
         'no_live_ticks' => 'Live тики не загружены.',
+        'tick_range' => 'Макс :high / Мин :low',
+        'tick_activity' => 'Объём :volume / Сделки :trades',
         'pinned_rates' => 'Закреплённые курсы',
         'no_pinned_rates' => 'Нет закреплённых курсов.',
         'prediction_stake' => 'Ставка прогноза',

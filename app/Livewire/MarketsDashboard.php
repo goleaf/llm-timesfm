@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Actions\Crypto\BuildLiveTickRowsAction;
 use App\Actions\Crypto\BuildMarketBoardAction;
 use App\Actions\Crypto\BuildMarketSeriesAction;
 use App\Actions\Crypto\CreatePredictionStakeAction;
@@ -216,6 +217,7 @@ class MarketsDashboard extends Component
     public function render(
         BuildMarketBoardAction $boardBuilder,
         BuildMarketSeriesAction $chartBuilder,
+        BuildLiveTickRowsAction $tickRowsBuilder,
         ReadMarketsDashboardAction $reader,
     ): View {
         $request = $this->dashboardRequest();
@@ -238,7 +240,7 @@ class MarketsDashboard extends Component
             'board' => $board,
             'selectedAsset' => $selectedAsset,
             'candles' => $dashboard['candles'],
-            'snapshots' => $dashboard['snapshots'],
+            'tickRows' => $tickRowsBuilder->handle($dashboard['snapshots']),
             'forecast' => $dashboard['forecast'],
             'forecasts' => $dashboard['forecasts'],
             'predictionStakes' => $dashboard['predictionStakes'],

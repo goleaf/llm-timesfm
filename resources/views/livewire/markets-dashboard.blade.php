@@ -347,16 +347,19 @@
                 <section class="rounded-md border border-white/10 bg-[#111317]">
                     <div class="flex items-center justify-between border-b border-white/10 px-4 py-3">
                         <h2 class="text-sm font-semibold uppercase text-zinc-300">{{ __('ui.market.live_ticks') }}</h2>
-                        <span class="text-xs text-zinc-500">{{ __('ui.market.updates', ['count' => $snapshots->count()]) }}</span>
+                        <span class="text-xs text-zinc-500">{{ __('ui.market.updates', ['count' => $tickRows->count()]) }}</span>
                     </div>
 
                     <div class="workbench-scroll max-h-80 overflow-auto">
-                        @forelse ($snapshots as $snapshot)
-                            <div wire:key="tick-{{ $snapshot->id }}" class="workbench-table-row grid grid-cols-[5rem_minmax(0,1fr)_minmax(0,1fr)_7rem] gap-3 border-b border-white/5 px-4 py-3 text-sm">
-                                <span class="font-mono text-xs text-zinc-500">{{ $snapshot->source_event_at->format('H:i:s') }}</span>
-                                <span class="font-semibold text-white">{{ number_format((float) $snapshot->price, (float) $snapshot->price >= 1 ? 2 : 8) }}</span>
-                                <span class="text-zinc-400">{{ number_format((float) $snapshot->bid_price, (float) $snapshot->bid_price >= 1 ? 2 : 8) }} / {{ number_format((float) $snapshot->ask_price, (float) $snapshot->ask_price >= 1 ? 2 : 8) }}</span>
-                                <span class="text-right text-zinc-400">{{ number_format((float) $snapshot->quote_volume, 0) }}</span>
+                        @forelse ($tickRows as $row)
+                            <div wire:key="tick-{{ $row['id'] }}" data-live-tick-row class="workbench-table-row grid grid-cols-[5rem_minmax(0,1fr)_minmax(0,1fr)_8rem] gap-3 border-b border-white/5 px-4 py-3 text-sm">
+                                <span class="font-mono text-xs text-zinc-500">{{ $row['time'] }}</span>
+                                <span class="min-w-0">
+                                    <span class="block truncate font-semibold text-white">{{ $row['price'] }}</span>
+                                    <span class="mt-0.5 block text-xs font-semibold {{ $row['change_positive'] ? 'text-emerald-300' : 'text-rose-300' }}">{{ $row['change'] }}</span>
+                                </span>
+                                <span class="truncate text-zinc-400">{{ $row['range'] }}</span>
+                                <span class="truncate text-right text-zinc-400">{{ $row['activity'] }}</span>
                             </div>
                         @empty
                             <div class="px-4 py-10 text-sm text-zinc-500">{{ __('ui.market.no_live_ticks') }}</div>

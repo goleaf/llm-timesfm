@@ -59,6 +59,8 @@ return [
         'live_ticks' => 'Live Ticks',
         'updates' => ':count updates',
         'no_live_ticks' => 'No live ticks loaded.',
+        'tick_range' => 'High :high / Low :low',
+        'tick_activity' => 'Vol :volume / Trades :trades',
         'pinned_rates' => 'Pinned Rates',
         'no_pinned_rates' => 'No pinned rates.',
         'prediction_stake' => 'Prediction Stake',

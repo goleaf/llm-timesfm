@@ -73,8 +73,8 @@ class BuildMarketBoardAction
             'is_pinned' => $isPinned,
             'is_selected' => $isSelected,
             'price' => $this->price($snapshot?->price),
-            'bid' => $this->price($snapshot?->bid_price),
-            'ask' => $this->price($snapshot?->ask_price),
+            'bid' => $this->nullablePrice($snapshot?->bid_price),
+            'ask' => $this->nullablePrice($snapshot?->ask_price),
             'high' => $this->price($snapshot?->high_price),
             'low' => $this->price($snapshot?->low_price),
             'quote_volume' => $this->number($snapshot?->quote_volume, 0),
@@ -233,6 +233,15 @@ class BuildMarketBoardAction
         $number = (float) $value;
 
         return number_format($number, abs($number) >= 1 ? 2 : 8);
+    }
+
+    private function nullablePrice(float|int|string|null $value): string
+    {
+        if ($value === null || (float) $value <= 0) {
+            return __('ui.common.na');
+        }
+
+        return $this->price($value);
     }
 
     private function number(float|int|string|null $value, int $decimals = 2): string
