@@ -82,6 +82,7 @@
 - [x] Include candle, live ticker, forecast, actual, and error details in chart payloads.
 - [x] Append the latest ticker snapshot to the market chart so it updates every second between candle closes.
 - [x] Preserve hover feedback after Livewire polling morphs the DOM.
+- [x] Keep market chart scale labels, latest marker, analyzer endpoint labels, metrics, analyzer lanes, and point ledger visible without requiring hover.
 
 ### Task 11: Full HD Market Workspace
 

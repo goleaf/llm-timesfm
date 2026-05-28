@@ -48,7 +48,7 @@ Write for a project owner, not for a compiler.
 - Analysis scoreboard: `https://llm-timesfm.test/markets/analyses/BTCUSDT`
 - Forecast statistics: `https://llm-timesfm.test/markets/stats/BTCUSDT`
 
-Public analysis screens use interactive SVG charts where needed. Hovering a chart shows the nearest stored point, guide line, marker, timestamp, values, volumes, forecast data, or error statistics depending on the chart.
+Public analysis screens use interactive SVG charts where needed. Hovering a chart shows the nearest stored point, guide line, marker, timestamp, values, volumes, forecast data, or error statistics depending on the chart. Market charts must also keep the key chart data visible without hover: scale labels, latest marker, analyzer endpoint labels, metric panels, analyzer lanes, and a point ledger.
 
 The market dashboard is designed for Full HD use: a wide shell, pair finder, source-driven first-currency list with pin controls, pinned rates, main chart workspace with visible analyzer forecast points, live tick feed, prediction stake panel, and forecast desk. Avoid returning it to a narrow centered dashboard or visible raw payload panel.
 

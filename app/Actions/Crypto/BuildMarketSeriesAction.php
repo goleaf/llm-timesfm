@@ -12,7 +12,7 @@ class BuildMarketSeriesAction
     /**
      * @param  Collection<int, mixed>  $candles
      * @param  Collection<int, CryptoForecast>|CryptoForecast|null  $forecasts
-     * @return array{history:string,forecast:string,forecast_series:array<int,array<string,mixed>>,min:float,max:float,latest:?float,tooltip:array<string,mixed>}
+     * @return array{history:string,forecast:string,forecast_series:array<int,array<string,mixed>>,min:float,max:float,latest:?float,scale_ticks:array<int,array<string,mixed>>,summary_cards:array<int,array<string,string>>,latest_marker:?array<string,mixed>,forecast_labels:array<int,array<string,mixed>>,point_ledger:array<int,array<string,string>>,tooltip:array<string,mixed>}
      */
     public function handle(Collection $candles, Collection|CryptoForecast|null $forecasts = null, ?CryptoPriceSnapshot $latestSnapshot = null): array
     {
@@ -83,6 +83,11 @@ class BuildMarketSeriesAction
                 'min' => 0.0,
                 'max' => 0.0,
                 'latest' => null,
+                'scale_ticks' => [],
+                'summary_cards' => [],
+                'latest_marker' => null,
+                'forecast_labels' => [],
+                'point_ledger' => [],
                 'tooltip' => $this->payload([], []),
             ];
         }
@@ -145,6 +150,7 @@ class BuildMarketSeriesAction
                             ...$position,
                             'title' => ucfirst((string) $forecast->source).' analysis',
                             'value' => $this->price($value),
+                            'raw_value' => $value,
                             'time' => $targetTime?->format('Y-m-d H:i:s') ?? "Step {$step}",
                             'color' => $color,
                             'rows' => [
@@ -161,12 +167,30 @@ class BuildMarketSeriesAction
                         ];
                     })
                     ->values();
+                $firstPoint = $points->first();
+                $lastPoint = $points->last();
 
                 return [
                     'label' => (string) $forecast->source,
                     'color' => $color,
                     'points' => $points->all(),
                     'polyline' => $this->polyline($points),
+                    'point_count' => $points->count(),
+                    'first_value' => $firstPoint ? (string) $firstPoint['value'] : 'n/a',
+                    'last_value' => $lastPoint ? (string) $lastPoint['value'] : 'n/a',
+                    'delta' => $firstPoint && $lastPoint
+                        ? $this->signedDelta((float) $firstPoint['raw_value'], (float) $lastPoint['raw_value'])
+                        : 'n/a',
+                    'target_window' => $forecast->target_starts_at && $forecast->target_ends_at
+                        ? $forecast->target_starts_at->format('H:i').' - '.$forecast->target_ends_at->format('H:i')
+                        : 'pending',
+                    'compared' => (int) $forecast->evaluated_points.'/'.(int) $forecast->total_points,
+                    'mape' => $forecast->mean_absolute_percentage_error
+                        ? number_format((float) $forecast->mean_absolute_percentage_error, 2).'%'
+                        : 'pending',
+                    'direction_accuracy' => $forecast->direction_accuracy
+                        ? number_format((float) $forecast->direction_accuracy, 2).'%'
+                        : 'pending',
                 ];
             })
             ->filter(fn (array $series): bool => $series['polyline'] !== '')
@@ -181,6 +205,11 @@ class BuildMarketSeriesAction
             'min' => $min,
             'max' => $max,
             'latest' => $historyValues->last(),
+            'scale_ticks' => $this->scaleTicks($min, $max, $range, $padding, $usableHeight),
+            'summary_cards' => $this->summaryCards($min, $max, $historyValues->last(), $historyMeta->count(), $forecastSeries, $historyMeta->last()),
+            'latest_marker' => $historyMeta->last(),
+            'forecast_labels' => $this->forecastLabels($forecastSeries),
+            'point_ledger' => $this->pointLedger($historyMeta->all(), $forecastSeries),
             'tooltip' => $this->payload($historyMeta->all(), $forecastSeries),
         ];
     }
@@ -221,6 +250,152 @@ class BuildMarketSeriesAction
             ->implode(' ');
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function scaleTicks(float $min, float $max, float $range, int $padding, int $usableHeight): array
+    {
+        return collect(range(0, 4))
+            ->map(function (int $index) use ($max, $range, $padding, $usableHeight): array {
+                $ratio = $index / 4;
+
+                return [
+                    'y' => round($padding + ($usableHeight * $ratio), 2),
+                    'label' => $this->price($max - ($range * $ratio)),
+                    'value' => $max - ($range * $ratio),
+                ];
+            })
+            ->all();
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $forecastSeries
+     * @param  array<string, mixed>|null  $latestMarker
+     * @return array<int, array<string, string>>
+     */
+    private function summaryCards(float $min, float $max, mixed $latest, int $marketPoints, array $forecastSeries, ?array $latestMarker): array
+    {
+        $forecastPointCount = collect($forecastSeries)->sum(fn (array $series): int => count($series['points']));
+        $spread = $max - $min;
+        $spreadPercent = $min !== 0.0 ? (($spread / abs($min)) * 100) : 0.0;
+
+        return [
+            [
+                'label' => 'Latest',
+                'value' => $this->price($latest),
+                'detail' => (string) ($latestMarker['time'] ?? 'waiting'),
+            ],
+            [
+                'label' => 'Visible high',
+                'value' => $this->price($max),
+                'detail' => 'top of range',
+            ],
+            [
+                'label' => 'Visible low',
+                'value' => $this->price($min),
+                'detail' => 'bottom of range',
+            ],
+            [
+                'label' => 'Spread',
+                'value' => $this->price($spread),
+                'detail' => number_format($spreadPercent, 2).'%',
+            ],
+            [
+                'label' => 'Market points',
+                'value' => number_format($marketPoints),
+                'detail' => 'candles plus live',
+            ],
+            [
+                'label' => 'Analysis points',
+                'value' => number_format($forecastPointCount),
+                'detail' => count($forecastSeries).' engines',
+            ],
+        ];
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $forecastSeries
+     * @return array<int, array<string, mixed>>
+     */
+    private function forecastLabels(array $forecastSeries): array
+    {
+        $seriesCount = max(count($forecastSeries), 1);
+
+        return collect($forecastSeries)
+            ->map(function (array $series, int $index) use ($seriesCount): ?array {
+                $lastPoint = collect($series['points'])->last();
+
+                if (! $lastPoint) {
+                    return null;
+                }
+
+                $offset = ($index - (($seriesCount - 1) / 2)) * 8;
+
+                return [
+                    'x' => min(max((float) $lastPoint['x'] + 7, 24), 616),
+                    'y' => min(max((float) $lastPoint['y'] + $offset, 26), 236),
+                    'label' => (string) $series['label'],
+                    'value' => (string) $lastPoint['value'],
+                    'color' => (string) $series['color'],
+                ];
+            })
+            ->filter()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $historyPoints
+     * @param  array<int, array<string, mixed>>  $forecastSeries
+     * @return array<int, array<string, string>>
+     */
+    private function pointLedger(array $historyPoints, array $forecastSeries): array
+    {
+        $marketRows = collect($historyPoints)
+            ->map(fn (array $point): array => $this->ledgerRow('Market', '#22d3ee', $point));
+
+        $analysisRows = collect($forecastSeries)
+            ->flatMap(fn (array $series): Collection => collect($series['points'])
+                ->map(fn (array $point): array => $this->ledgerRow((string) $series['label'], (string) $series['color'], $point)));
+
+        return $marketRows
+            ->merge($analysisRows)
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param  array<string, mixed>  $point
+     * @return array<string, string>
+     */
+    private function ledgerRow(string $series, string $color, array $point): array
+    {
+        $rows = collect($point['rows'] ?? [])
+            ->mapWithKeys(fn (array $row): array => [(string) $row['label'] => (string) $row['value']]);
+        $type = (string) $rows->get('Type', $point['title'] ?? $series);
+
+        if ($type === 'Analysis point') {
+            $detail = 'Step '.$rows->get('Step', 'n/a').' -> '.$rows->get('Target time', 'pending');
+            $metrics = 'Q '.$rows->get('Low quantile', 'n/a').' / '.$rows->get('Median quantile', 'n/a').' / '.$rows->get('High quantile', 'n/a');
+        } elseif ($type === 'Live price') {
+            $detail = 'Bid '.$rows->get('Bid', 'n/a').' / Ask '.$rows->get('Ask', 'n/a');
+            $metrics = '24h '.$rows->get('24h change', 'n/a').' / Vol '.$rows->get('Quote volume', 'n/a');
+        } else {
+            $detail = 'O '.$rows->get('Open', 'n/a').' / H '.$rows->get('High', 'n/a').' / L '.$rows->get('Low', 'n/a');
+            $metrics = 'Vol '.$rows->get('Quote volume', 'n/a').' / Trades '.$rows->get('Trades', 'n/a');
+        }
+
+        return [
+            'series' => $series,
+            'color' => $color,
+            'type' => $type,
+            'time' => (string) ($point['time'] ?? 'pending'),
+            'value' => (string) ($point['value'] ?? 'n/a'),
+            'detail' => $detail,
+            'metrics' => $metrics,
+        ];
+    }
+
     private function price(float|int|string|null $value): string
     {
         if ($value === null) {
@@ -240,6 +415,14 @@ class BuildMarketSeriesAction
     private function percent(float|int|string|null $value): string
     {
         return $value === null ? 'n/a' : number_format((float) $value, 2).'%';
+    }
+
+    private function signedDelta(float $first, float $last): string
+    {
+        $delta = $last - $first;
+        $percent = $first !== 0.0 ? ($delta / abs($first)) * 100 : 0.0;
+
+        return ($delta >= 0 ? '+' : '').$this->price($delta).' / '.($percent >= 0 ? '+' : '').number_format($percent, 2).'%';
     }
 
     private function forecastColor(int $index): string

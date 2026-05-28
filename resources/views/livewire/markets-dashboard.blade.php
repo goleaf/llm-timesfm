@@ -214,8 +214,18 @@
                                 <line x1="18" y1="242" x2="702" y2="242" stroke="#3f3f46" stroke-width="1"></line>
                                 <line x1="18" y1="18" x2="18" y2="242" stroke="#3f3f46" stroke-width="1"></line>
 
+                                @foreach ($chart['scale_ticks'] as $tick)
+                                    <line x1="18" y1="{{ $tick['y'] }}" x2="702" y2="{{ $tick['y'] }}" stroke="#27272a" stroke-width="0.75"></line>
+                                    <text x="696" y="{{ $tick['y'] - 3 }}" text-anchor="end" fill="#a1a1aa" font-size="8">{{ $tick['label'] }}</text>
+                                @endforeach
+
                                 @if ($chart['history'])
                                     <polyline points="{{ $chart['history'] }}" fill="none" stroke="#22d3ee" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                                @endif
+
+                                @if ($chart['latest_marker'])
+                                    <circle cx="{{ $chart['latest_marker']['x'] }}" cy="{{ $chart['latest_marker']['y'] }}" r="4.5" fill="#22d3ee" stroke="#0b0d10" stroke-width="1.5"></circle>
+                                    <text x="{{ min($chart['latest_marker']['x'] + 7, 612) }}" y="{{ max($chart['latest_marker']['y'] - 7, 26) }}" fill="#67e8f9" font-size="8" font-weight="600">Latest {{ $chart['latest_marker']['value'] }}</text>
                                 @endif
 
                                 @foreach ($chart['forecast_series'] as $series)
@@ -226,6 +236,10 @@
                                     @endforeach
                                 @endforeach
 
+                                @foreach ($chart['forecast_labels'] as $label)
+                                    <text x="{{ $label['x'] }}" y="{{ $label['y'] }}" fill="{{ $label['color'] }}" font-size="8" font-weight="600">{{ $label['label'] }} {{ $label['value'] }}</text>
+                                @endforeach
+
                                 <line data-chart-guide class="hidden" y1="18" y2="242" stroke="#f8fafc" stroke-width="1" stroke-dasharray="4 5" opacity="0.72"></line>
                                 <circle data-chart-marker class="hidden" r="5" fill="#f8fafc" stroke="#0b0d10" stroke-width="2"></circle>
                                 <rect x="0" y="0" width="720" height="260" fill="transparent"></rect>
@@ -233,6 +247,77 @@
                             <div data-chart-tooltip class="pointer-events-none absolute z-20 hidden max-w-72 rounded-md border border-white/15 bg-zinc-950/95 px-3 py-2 text-xs text-zinc-100 shadow-2xl shadow-black/40"></div>
                             <script type="application/json" data-chart-payload>{!! json_encode($chart['tooltip'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}</script>
                         </div>
+
+                        <div class="grid border-x border-b border-white/10 bg-[#0b0d10] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)]">
+                            <section class="border-b border-white/10 p-3 lg:border-b-0 lg:border-r">
+                                <div class="flex items-center justify-between gap-3">
+                                    <h3 class="text-xs font-semibold uppercase text-zinc-400">Chart Metrics</h3>
+                                    <span class="text-xs text-zinc-500">{{ $chart['tooltip']['point_count'] ?? 0 }} points</span>
+                                </div>
+                                <div class="mt-3 grid gap-2 sm:grid-cols-2">
+                                    @foreach ($chart['summary_cards'] as $metric)
+                                        <div class="border-b border-white/5 pb-2">
+                                            <p class="text-xs text-zinc-500">{{ $metric['label'] }}</p>
+                                            <p class="mt-0.5 truncate text-sm font-semibold text-white">{{ $metric['value'] }}</p>
+                                            <p class="mt-0.5 truncate text-xs text-zinc-500">{{ $metric['detail'] }}</p>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </section>
+
+                            <section class="p-3">
+                                <div class="flex items-center justify-between gap-3">
+                                    <h3 class="text-xs font-semibold uppercase text-zinc-400">Analyzer Lanes</h3>
+                                    <span class="text-xs text-zinc-500">{{ count($chart['forecast_series']) }} engines</span>
+                                </div>
+                                <div class="mt-3 grid gap-2 md:grid-cols-2">
+                                    @forelse ($chart['forecast_series'] as $series)
+                                        <div wire:key="chart-lane-{{ $series['label'] }}" class="border-b border-white/5 pb-2">
+                                            <div class="flex items-center justify-between gap-2">
+                                                <span class="flex min-w-0 items-center gap-2">
+                                                    <span class="h-2.5 w-2.5 shrink-0 rounded-full" style="background: {{ $series['color'] }}"></span>
+                                                    <span class="truncate text-sm font-semibold text-white">{{ $series['label'] }}</span>
+                                                </span>
+                                                <span class="text-xs text-zinc-500">{{ $series['point_count'] }} pts</span>
+                                            </div>
+                                            <div class="mt-1 grid grid-cols-2 gap-2 text-xs">
+                                                <span class="truncate text-zinc-500">First <span class="font-semibold text-zinc-200">{{ $series['first_value'] }}</span></span>
+                                                <span class="truncate text-zinc-500">Last <span class="font-semibold text-zinc-200">{{ $series['last_value'] }}</span></span>
+                                                <span class="truncate text-zinc-500">Move <span class="font-semibold text-zinc-200">{{ $series['delta'] }}</span></span>
+                                                <span class="truncate text-zinc-500">MAPE <span class="font-semibold text-zinc-200">{{ $series['mape'] }}</span></span>
+                                                <span class="truncate text-zinc-500">Checked <span class="font-semibold text-zinc-200">{{ $series['compared'] }}</span></span>
+                                                <span class="truncate text-zinc-500">Direction <span class="font-semibold text-zinc-200">{{ $series['direction_accuracy'] }}</span></span>
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <div class="py-4 text-sm text-zinc-500">No analyzer lanes.</div>
+                                    @endforelse
+                                </div>
+                            </section>
+                        </div>
+
+                        <section class="border-x border-b border-white/10 bg-[#0b0d10]">
+                            <div class="flex items-center justify-between gap-3 border-b border-white/10 px-3 py-2">
+                                <h3 class="text-xs font-semibold uppercase text-zinc-400">Chart Point Ledger</h3>
+                                <span class="text-xs text-zinc-500">{{ count($chart['point_ledger']) }} visible rows</span>
+                            </div>
+                            <div class="max-h-72 overflow-auto">
+                                @forelse ($chart['point_ledger'] as $index => $row)
+                                    <div wire:key="chart-ledger-{{ $index }}-{{ $row['series'] }}-{{ $row['time'] }}" class="grid gap-2 border-b border-white/5 px-3 py-2 text-xs lg:grid-cols-[7rem_9rem_minmax(0,1fr)_minmax(0,1fr)_8rem]">
+                                        <span class="flex min-w-0 items-center gap-2">
+                                            <span class="h-2 w-2 shrink-0 rounded-full" style="background: {{ $row['color'] }}"></span>
+                                            <span class="truncate font-semibold text-zinc-100">{{ $row['series'] }}</span>
+                                        </span>
+                                        <span class="truncate text-zinc-500">{{ $row['time'] }}</span>
+                                        <span class="truncate text-zinc-400">{{ $row['detail'] }}</span>
+                                        <span class="truncate text-zinc-500">{{ $row['metrics'] }}</span>
+                                        <span class="text-right font-semibold text-white">{{ $row['value'] }}</span>
+                                    </div>
+                                @empty
+                                    <div class="px-3 py-6 text-sm text-zinc-500">No chart points.</div>
+                                @endforelse
+                            </div>
+                        </section>
                     </div>
                 </div>
 

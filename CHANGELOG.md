@@ -4,6 +4,7 @@ This file is the human-readable history of the project. It must be updated after
 
 ## 2026-05-28
 
+- Expanded the market chart so important values are visible without hovering: price scale, latest marker, analyzer endpoint labels, chart metrics, analyzer lanes, and a live point ledger now stay on screen while the hover tooltip remains available.
 - Added a live first-currency list inside the market finder so available currencies come from stored source data, show their matching pairs, and can pin the best matching rate directly from the field.
 - Connected automatic real-data analysis engines for trend, moving average, EMA, momentum, and TimesFM when available; the market chart now shows each analyzer's forecast points, and a new analysis scoreboard compares every stored analysis with real candle data.
 - Added manual prediction stakes on the market dashboard so a user can choose a market, target time, expected price, direction, confidence, and note, then let the system resolve the stake against stored candle data.

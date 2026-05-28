@@ -11,7 +11,7 @@ Public repository: `https://github.com/goleaf/llm-timesfm`
 - Runs trend, moving average, EMA, momentum, and TimesFM analysis when available.
 - Stores manual prediction stakes for a chosen target time and resolves them against real candle data.
 - Shows real-time Livewire screens without page reloads.
-- Shows interactive SVG charts with hover tooltips for candle, live price, forecast, and forecast-accuracy details.
+- Shows interactive SVG charts with always-visible scale labels, latest markers, analyzer labels, metric panels, point ledgers, and hover tooltips for deeper candle, live price, forecast, and forecast-accuracy details.
 - Uses a wide Full HD dashboard layout with a source-driven first-currency list, pair finder, pinned rates, chart workspace, visible analysis points, live tick feed, prediction stake panel, and forecast desk.
 - Runs scheduled automation for market updates, missing candle backfill, forecast creation, and forecast evaluation.
 - Keeps the project open: no login, no user accounts, no private panels.
@@ -49,13 +49,14 @@ The scheduled automation keeps the local SQLite database fresh:
 - manual prediction stakes are resolved once their target candle has closed
 - new short-range analysis forecasts are created automatically every minute for the most active markets
 - the market chart includes the latest ticker snapshot as a live point, so it can update every second between candle closes
-- the market chart displays analyzer forecast points directly on the line so the predicted points are visible before real candles arrive
+- the market chart displays analyzer forecast points, endpoint labels, chart metrics, analyzer lanes, and a point ledger so predicted points are visible before real candles arrive
 
 ## Market Dashboard
 
 - Pair Finder searches by first and second currency, and the First currency field shows a live list from stored source data with direct pin controls for the best matching pair.
 - Pinned rates can be added or removed directly from the dashboard and are remembered for the current browser session.
 - Automatic analysis engines draw their forecast points on the market graph and are scored later against real candles.
+- The chart keeps scale values, latest price, analyzer endpoints, engine metrics, and the visible point ledger on screen while hover tooltips remain available.
 - Prediction Stake saves a user-entered target time, target price, direction, confidence, and note for the selected market.
 - The visible interface shows market rows, live ticks, charts, pinned rates, and forecasts; raw payload blocks are not shown on the screen.
 

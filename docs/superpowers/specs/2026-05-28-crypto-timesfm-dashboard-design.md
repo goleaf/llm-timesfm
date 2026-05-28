@@ -16,7 +16,7 @@ The project is public and Livewire-only. It intentionally has no authentication 
 
 The realtime read path is cached through short-lived Laravel cache entries. SQLite remains the local source of truth and runs with WAL-oriented settings, while Redis can be used as a faster cache store when available. Scheduler-driven ticker updates refresh market data and warm the most common dashboard reads so Livewire polling does not repeat the same database work for every viewer.
 
-Charts are rendered as SVG from server-built point payloads. Each payload contains the visible polyline coordinates and the hover rows for every point. Browser JavaScript only reads that payload, finds the nearest point under the mouse, and shows a marker, guide line, and data tooltip. The market chart adds the latest ticker snapshot as a live point so the graph can move every second even when the candle interval has not closed yet.
+Charts are rendered as SVG from server-built point payloads. Each payload contains the visible polyline coordinates, scale ticks, summary metrics, analyzer lanes, point ledger rows, and the hover rows for every point. Browser JavaScript only reads the hover payload, finds the nearest point under the mouse, and shows a marker, guide line, and data tooltip. The market chart adds the latest ticker snapshot as a live point so the graph can move every second even when the candle interval has not closed yet.
 
 The market screen targets Full HD workstations. It uses a wide shell with a left pair finder, source-driven first-currency list with pin controls, central chart workspace, live tick feed, right-side pinned rates, and forecast desk. The visible interface is market-focused and does not show raw payload blocks.
 

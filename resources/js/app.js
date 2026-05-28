@@ -41,6 +41,14 @@ const setHidden = (element, hidden) => {
     element.classList.toggle('hidden', hidden);
 };
 
+const chartForTarget = (target) => {
+    if (!(target instanceof Element)) {
+        return null;
+    }
+
+    return target.closest('[data-interactive-chart]');
+};
+
 const tooltipMarkup = (points) => {
     const header = points
         .map((point) => `
@@ -99,7 +107,7 @@ const showChartPoint = (event) => {
         clientY: event.clientY,
     };
 
-    const chart = event.target.closest('[data-interactive-chart]');
+    const chart = chartForTarget(event.target);
 
     if (!chart) {
         return;
@@ -143,7 +151,7 @@ const showChartPoint = (event) => {
 };
 
 const hideChartPoint = (event) => {
-    const chart = event.target.closest('[data-interactive-chart]');
+    const chart = chartForTarget(event.target);
 
     if (!chart) {
         return;
@@ -166,7 +174,7 @@ const refreshHoveredChart = () => {
 
     const target = document.elementFromPoint(lastPointer.clientX, lastPointer.clientY);
 
-    if (!target?.closest('[data-interactive-chart]')) {
+    if (!chartForTarget(target)) {
         return;
     }
 
