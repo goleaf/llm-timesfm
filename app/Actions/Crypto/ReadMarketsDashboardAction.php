@@ -47,7 +47,7 @@ class ReadMarketsDashboardAction
      */
     private function assets(int $limit): Collection
     {
-        return $this->cache->remember(
+        return $this->cache->rememberCollection(
             "markets:assets:{$limit}",
             'assets',
             fn () => CryptoAsset::query()->dashboardList($limit)->get(),
@@ -71,7 +71,7 @@ class ReadMarketsDashboardAction
      */
     private function candles(CryptoAsset $asset, string $interval): Collection
     {
-        return $this->cache->remember(
+        return $this->cache->rememberCollection(
             "markets:candles:{$asset->getKey()}:{$interval}:160",
             'market_history',
             fn () => CryptoCandle::query()
@@ -107,7 +107,7 @@ class ReadMarketsDashboardAction
      */
     private function snapshots(CryptoAsset $asset): Collection
     {
-        return $this->cache->remember(
+        return $this->cache->rememberCollection(
             "markets:snapshots:{$asset->getKey()}:20",
             'snapshots',
             fn () => CryptoPriceSnapshot::query()

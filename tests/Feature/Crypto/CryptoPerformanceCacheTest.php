@@ -7,6 +7,7 @@ use App\Models\CryptoForecast;
 use App\Models\CryptoPriceSnapshot;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -92,6 +93,32 @@ it('serves repeated market dashboard reads from cache and invalidates on new mar
     $fresh = $reader->handle('BTCUSDT', '1m');
 
     expect($fresh['selectedAsset']?->latestSnapshot?->price)->toEqual('111.000000000000');
+});
+
+it('refreshes stale collection cache entries with the wrong shape', function (): void {
+    $asset = CryptoAsset::factory()
+        ->hasCandles(3, [
+            'interval' => '1m',
+            'close_price' => '100.000000000000',
+        ])
+        ->create([
+            'symbol' => 'BTCUSDT',
+            'base_asset' => 'BTC',
+            'quote_asset' => 'USDT',
+            'rank' => 1,
+        ]);
+    $cacheKey = "crypto:v1:markets:candles:{$asset->getKey()}:1m:160";
+
+    Cache::store('array')->forever('crypto:data-version', 1);
+    Cache::store('array')->put($cacheKey, 'stale-wrong-value', 60);
+
+    $dashboard = app(ReadMarketsDashboardAction::class)->handle('BTCUSDT', '1m');
+
+    expect($dashboard['candles'])
+        ->toBeInstanceOf(Collection::class)
+        ->toHaveCount(3)
+        ->and(Cache::store('array')->get($cacheKey))
+        ->toBeInstanceOf(Collection::class);
 });
 
 it('warms market and forecast dashboard cache for configured realtime symbols', function (): void {

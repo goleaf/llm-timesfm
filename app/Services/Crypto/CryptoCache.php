@@ -19,6 +19,40 @@ class CryptoCache
      */
     public function remember(string $key, string $ttlKey, Closure $callback): mixed
     {
+        return $this->resolve(
+            $key,
+            $ttlKey,
+            $callback,
+            fn (mixed $value): bool => ! $this->containsIncompleteClass($value),
+        );
+    }
+
+    /**
+     * @template TKey of array-key
+     * @template TValue
+     *
+     * @param  Closure(): Collection<TKey, TValue>  $callback
+     * @return Collection<TKey, TValue>
+     */
+    public function rememberCollection(string $key, string $ttlKey, Closure $callback): Collection
+    {
+        $value = $this->resolve(
+            $key,
+            $ttlKey,
+            $callback,
+            fn (mixed $cached): bool => $cached instanceof Collection
+                && ! $this->containsIncompleteClass($cached),
+        );
+
+        return $value instanceof Collection ? $value : collect();
+    }
+
+    /**
+     * @param  Closure(): mixed  $callback
+     * @param  callable(mixed): bool  $isValid
+     */
+    private function resolve(string $key, string $ttlKey, Closure $callback, callable $isValid): mixed
+    {
         if (! (bool) config('crypto.cache.enabled', true)) {
             return $callback();
         }
@@ -29,7 +63,7 @@ class CryptoCache
         if ($repository->has($cacheKey)) {
             $value = $repository->get($cacheKey);
 
-            if (! $this->containsIncompleteClass($value)) {
+            if ($isValid($value)) {
                 return $value;
             }
 
@@ -37,7 +71,10 @@ class CryptoCache
         }
 
         $value = $callback();
-        $repository->put($cacheKey, $value, $this->seconds($ttlKey));
+
+        if ($isValid($value)) {
+            $repository->put($cacheKey, $value, $this->seconds($ttlKey));
+        }
 
         return $value;
     }
@@ -49,6 +86,27 @@ class CryptoCache
         }
 
         $this->repository()->forever(self::VERSION_KEY, $this->version() + 1);
+    }
+
+    private function containsIncompleteClass(mixed $value): bool
+    {
+        if ($value instanceof \__PHP_Incomplete_Class) {
+            return true;
+        }
+
+        if ($value instanceof Collection) {
+            return $value->contains(fn (mixed $item): bool => $this->containsIncompleteClass($item));
+        }
+
+        if (is_array($value)) {
+            foreach ($value as $item) {
+                if ($this->containsIncompleteClass($item)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private function versionedKey(string $key): string
@@ -79,26 +137,5 @@ class CryptoCache
         $store = config('crypto.cache.store');
 
         return $store ? Cache::store((string) $store) : Cache::store();
-    }
-
-    private function containsIncompleteClass(mixed $value): bool
-    {
-        if ($value instanceof \__PHP_Incomplete_Class) {
-            return true;
-        }
-
-        if ($value instanceof Collection) {
-            return $value->contains(fn (mixed $item): bool => $this->containsIncompleteClass($item));
-        }
-
-        if (is_array($value)) {
-            foreach ($value as $item) {
-                if ($this->containsIncompleteClass($item)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 }

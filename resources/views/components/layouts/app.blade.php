@@ -6,6 +6,8 @@
 
         <title>{{ $title ?? config('app.name') }}</title>
 
+        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+        <link rel="shortcut icon" href="{{ asset('favicon.svg') }}">
         @fonts
         @vite(['resources/css/app.css', 'resources/css/app.scss', 'resources/js/app.js'])
         @livewireStyles

@@ -4,6 +4,7 @@ This file is the human-readable history of the project. It must be updated after
 
 ## 2026-05-28
 
+- Removed browser console noise on the market dashboard by adding a real site icon and making live dashboard cache reads recover automatically from stale values that no longer match the expected data shape.
 - Rebuilt the market screen as a trading dashboard with a left-side pair finder, first and second currency filters, editable pinned rates, a live tick feed, one-second updates, and no visible raw payload panels.
 - Reworked the application architecture so screen input and command options are validated before workflows run, while market loading, forecast runs, syncing, backfills, and watch loops now live in dedicated workflow actions instead of being mixed into the user interface or command layer.
 - Reworked the market dashboard for Full HD monitors with a much wider workspace, a taller chart, and a dedicated live market workspace.

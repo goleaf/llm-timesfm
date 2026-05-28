@@ -51,7 +51,7 @@ class ReadForecastStatsDashboardAction
      */
     private function assets(int $limit): Collection
     {
-        return $this->cache->remember(
+        return $this->cache->rememberCollection(
             "stats:assets:{$limit}",
             'assets',
             fn () => CryptoAsset::query()->dashboardList($limit)->get(),
@@ -75,7 +75,7 @@ class ReadForecastStatsDashboardAction
      */
     private function forecasts(CryptoAsset $asset, string $interval): Collection
     {
-        return $this->cache->remember(
+        return $this->cache->rememberCollection(
             "stats:forecasts:{$asset->getKey()}:{$interval}:12",
             'forecast_stats',
             fn () => CryptoForecast::query()
@@ -111,7 +111,7 @@ class ReadForecastStatsDashboardAction
      */
     private function points(CryptoAsset $asset, string $interval): Collection
     {
-        return $this->cache->remember(
+        return $this->cache->rememberCollection(
             "stats:points:{$asset->getKey()}:{$interval}:160",
             'forecast_stats',
             fn () => CryptoForecastPoint::query()
