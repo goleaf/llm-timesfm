@@ -73,8 +73,12 @@ class ForecastStatsDashboard extends Component
             'forecasts' => $dashboard['forecasts'],
             'points' => $dashboard['points'],
             'pendingPoints' => $dashboard['pendingPoints'],
+            'pendingPointRows' => $dashboard['pendingPointRows'],
             'chart' => $chartBuilder->handle($dashboard['points']),
             'metrics' => $dashboard['metrics'],
+            'engineRows' => $dashboard['engineRows'],
+            'bestPoints' => $dashboard['bestPoints'],
+            'worstPoints' => $dashboard['worstPoints'],
         ]);
     }
 

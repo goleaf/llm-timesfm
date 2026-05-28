@@ -197,8 +197,10 @@ it('renders realtime forecast statistics from evaluated forecast points', functi
         ->assertSee('data-interactive-chart', false)
         ->assertSee('data-chart-payload', false)
         ->assertSee(__('ui.stats.error_percent'))
-        ->assertSee(__('ui.stats.recent_points'))
-        ->assertSee(__('ui.stats.forecast_runs'));
+        ->assertSee(__('ui.stats.engine_breakdown'))
+        ->assertSee(__('ui.stats.detailed_points'))
+        ->assertSee(__('ui.stats.pending_table'))
+        ->assertSee(__('ui.stats.run_details'));
 
     Livewire::test(ForecastStatsDashboard::class, ['symbol' => 'BTCUSDT'])
         ->assertSet('selectedSymbol', 'BTCUSDT')

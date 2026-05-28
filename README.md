@@ -67,6 +67,7 @@ The scheduled automation keeps the local SQLite database fresh:
 - The analysis scoreboard compares every stored analyzer by checked points, pending points, average error, and direction accuracy.
 - Evaluated analysis points show predicted price, actual candle close, and error percentage.
 - Analysis runs stay separated by engine so weak engines are visible instead of being mixed into one number.
+- The forecast statistics screen shows market context, forecast totals, source coverage, MAPE and MAE, best and worst points, pending forecast targets, detailed evaluated points, and full run windows for each stored forecast.
 
 ## Performance
 

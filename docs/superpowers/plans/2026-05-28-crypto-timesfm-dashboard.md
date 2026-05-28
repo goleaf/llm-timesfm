@@ -113,3 +113,10 @@
 - [x] Add a persistent RU / EN language switcher for the public Livewire shell.
 - [x] Move dashboard, action message, chart label, analysis, and statistics copy into translation files.
 - [x] Verify the dashboard can render in Russian by default and English from the current browser session.
+
+### Task 15: Expanded Forecast Statistics
+
+- [x] Add market context and expanded forecast accuracy totals to the statistics page.
+- [x] Add engine-by-engine scoring with runs, evaluated points, pending points, MAPE, MAE, and direction accuracy.
+- [x] Add best and worst evaluated forecast points, detailed evaluated rows, pending forecast targets, and full forecast-run windows.
+- [x] Keep the statistics page Livewire-only, Russian-first, translated, and backed by action-prepared data.

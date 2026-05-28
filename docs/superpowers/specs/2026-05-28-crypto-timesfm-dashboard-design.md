@@ -20,6 +20,8 @@ Charts are rendered as SVG from server-built point payloads. Each payload contai
 
 The market screen targets Full HD workstations. It uses a wide shell with a left pair finder, source-driven first-currency list with pin controls, central chart workspace, live tick feed, right-side pinned rates, and forecast desk. The visible interface is market-focused and does not show raw payload blocks.
 
+The forecast statistics screen is a full diagnostic surface, not a small summary. It shows market context, source counts, coverage, MAPE, MAE, direction accuracy, engine breakdowns, ranked best and worst points, evaluated point details, pending target rows, and forecast-run windows from preloaded action data.
+
 The public interface is Russian-first with a persistent RU / EN language switcher. User-facing dashboard copy, action messages, chart labels, analysis text, and statistics text are translated through language files so the same Livewire screens can render in Russian or English.
 
 ## Data Flow
@@ -36,6 +38,7 @@ The public interface is Russian-first with a persistent RU / EN language switche
 10. The market board builder converts eager-loaded assets into pair finder rows, first-currency options, pinned rate rows, and selected-market summary fields before they reach the Livewire view.
 11. Request objects validate symbols, intervals, forecast periods, limits, and watch windows before the related action is called.
 12. Locale middleware applies the selected session language before Livewire renders dashboards, actions build messages, and chart payload builders create labels.
+13. The forecast statistics reader prepares engine rows, ranked points, pending points, and run details before the Livewire view renders.
 
 ## Constraints
 

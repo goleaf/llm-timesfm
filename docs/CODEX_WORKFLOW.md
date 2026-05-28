@@ -51,6 +51,8 @@ Write for a project owner, not for a compiler.
 
 Public analysis screens use interactive SVG charts where needed. Hovering a chart shows the nearest stored point, guide line, marker, timestamp, values, volumes, forecast data, or error statistics depending on the chart. Market charts must also keep the key chart data visible without hover: scale labels, latest marker, analyzer endpoint labels, metric panels, analyzer lanes, and a point ledger. Chart zoom must stay client-side, preserve hover behavior, and restore its viewport after Livewire morphs.
 
+The forecast statistics screen must stay information-dense. It should show market context, forecast totals, source coverage, engine-by-engine scoring, best and worst evaluated points, detailed evaluated rows, pending forecast targets, and run windows instead of only a small chart and a short list.
+
 The market dashboard is designed for Full HD use: a wide shell, pair finder, source-driven first-currency list with pin controls, pinned rates, main chart workspace with visible analyzer forecast points, live tick feed, prediction stake panel, and forecast desk. Avoid returning it to a narrow centered dashboard or visible raw payload panel.
 
 The public interface is Russian-first. All user-facing dashboard labels, action messages, chart payload labels, analysis pages, and statistics pages must have Russian and English strings. Do not hardcode new public copy in Livewire views or actions unless it is market data, a symbol, a technical abbreviation, or a user-entered value.
