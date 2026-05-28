@@ -1,0 +1,8 @@
+name: llm-timesfm
+php: '8.5'
+secured: true
+aliases:
+    - llm-timesfm
+services: []
+integrations:
+    forge: []
