@@ -78,6 +78,11 @@ class CryptoAsset extends Model
         return $this->hasMany(CryptoForecastPoint::class);
     }
 
+    public function predictionStakes(): HasMany
+    {
+        return $this->hasMany(CryptoPredictionStake::class);
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $this->ensureColumns($query)->where('is_active', true);

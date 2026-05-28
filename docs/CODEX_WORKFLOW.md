@@ -49,7 +49,9 @@ Write for a project owner, not for a compiler.
 
 Both screens use interactive SVG charts. Hovering a chart shows the nearest stored point, guide line, marker, timestamp, values, volumes, forecast data, or error statistics depending on the chart.
 
-The market dashboard is designed for Full HD use: a wide shell, pair finder, pinned rates, main chart workspace, live tick feed, and forecast desk. Avoid returning it to a narrow centered dashboard or visible raw payload panel.
+The market dashboard is designed for Full HD use: a wide shell, pair finder, pinned rates, main chart workspace, live tick feed, prediction stake panel, and forecast desk. Avoid returning it to a narrow centered dashboard or visible raw payload panel.
+
+Prediction stakes are manual, public, non-authenticated records. Keep their form validation in request objects, creation and evaluation in actions, and resolution based on stored candle data rather than browser-side calculations.
 
 ## Current Performance Defaults
 
@@ -58,3 +60,4 @@ The market dashboard is designed for Full HD use: a wide shell, pair finder, pin
 - The scheduler warms the hottest dashboard cache entries after ticker updates.
 - `php artisan crypto:warm-dashboard-cache --limit=3` can be run manually after large imports.
 - New query patterns should get a matching Eloquent scope, short cache TTL, and migration-backed composite index.
+- Prediction stake reads use the same short dashboard cache pattern and must stay indexed by selected market, interval, status, and target time.

@@ -26,6 +26,7 @@ it('adds composite indexes for realtime market and forecast queries', function (
     $candleIndexes = collect(Schema::getIndexes('crypto_candles'))->keyBy('name');
     $forecastIndexes = collect(Schema::getIndexes('crypto_forecasts'))->keyBy('name');
     $pointIndexes = collect(Schema::getIndexes('crypto_forecast_points'))->keyBy('name');
+    $stakeIndexes = collect(Schema::getIndexes('crypto_prediction_stakes'))->keyBy('name');
 
     expect($assetIndexes->get('crypto_assets_active_rank_volume_id_index')['columns'])
         ->toBe(['is_active', 'rank', 'sort_quote_volume', 'id'])
@@ -40,7 +41,11 @@ it('adds composite indexes for realtime market and forecast queries', function (
         ->and($pointIndexes->get('crypto_forecast_points_asset_interval_eval_target_id_index')['columns'])
         ->toBe(['crypto_asset_id', 'interval', 'evaluated_at', 'target_open_time', 'id'])
         ->and($pointIndexes->get('crypto_forecast_points_forecast_eval_index')['columns'])
-        ->toBe(['crypto_forecast_id', 'evaluated_at']);
+        ->toBe(['crypto_forecast_id', 'evaluated_at'])
+        ->and($stakeIndexes->get('crypto_prediction_stakes_asset_interval_status_target_index')['columns'])
+        ->toBe(['crypto_asset_id', 'interval', 'status', 'target_at', 'id'])
+        ->and($stakeIndexes->get('crypto_prediction_stakes_asset_interval_target_index')['columns'])
+        ->toBe(['crypto_asset_id', 'interval', 'target_at', 'id']);
 });
 
 it('serves repeated market dashboard reads from cache and invalidates on new market data', function (): void {

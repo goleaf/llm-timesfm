@@ -4,12 +4,16 @@ namespace App\Livewire;
 
 use App\Actions\Crypto\BuildMarketBoardAction;
 use App\Actions\Crypto\BuildMarketSeriesAction;
+use App\Actions\Crypto\CreatePredictionStakeAction;
 use App\Actions\Crypto\EnsureMarketHistoryAction;
+use App\Actions\Crypto\EvaluatePredictionStakesAction;
 use App\Actions\Crypto\LoadMarketHistoryAction;
 use App\Actions\Crypto\ReadMarketsDashboardAction;
 use App\Actions\Crypto\RunMarketForecastAction;
 use App\Http\Requests\Crypto\MarketsDashboardRequest;
+use App\Http\Requests\Crypto\StorePredictionStakeRequest;
 use Illuminate\Contracts\View\View;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Throwable;
@@ -29,6 +33,16 @@ class MarketsDashboard extends Component
 
     public string $quoteSearch = '';
 
+    public string $stakeTargetAt = '';
+
+    public string $stakeTargetPrice = '';
+
+    public string $stakeDirection = 'above';
+
+    public int $stakeConfidence = 60;
+
+    public string $stakeNote = '';
+
     /**
      * @var array<int, string>
      */
@@ -44,6 +58,11 @@ class MarketsDashboard extends Component
      */
     public array $forecastOptions = [];
 
+    /**
+     * @var array<string, string>
+     */
+    public array $stakeDirectionOptions = [];
+
     public function mount(?string $symbol = null): void
     {
         $request = MarketsDashboardRequest::fromRoute($symbol);
@@ -54,11 +73,17 @@ class MarketsDashboard extends Component
         $this->intervalOptions = MarketsDashboardRequest::intervalOptions();
         $this->forecastOptions = MarketsDashboardRequest::forecastOptions();
         $this->pinnedSymbols = $this->storedPinnedSymbols();
+        $this->stakeDirectionOptions = StorePredictionStakeRequest::directionOptions();
+        $this->resetStakeTargetTime();
     }
 
     public function refreshMarket(): void
     {
-        $this->notice = null;
+        try {
+            app(EvaluatePredictionStakesAction::class)->handle(50);
+        } catch (Throwable $exception) {
+            $this->notice = $exception->getMessage();
+        }
     }
 
     public function selectAsset(string $symbol): void
@@ -83,6 +108,7 @@ class MarketsDashboard extends Component
         }
 
         $this->interval = $request->interval;
+        $this->resetStakeTargetTime();
         $this->loadHistoryIfMissing($request);
     }
 
@@ -159,6 +185,32 @@ class MarketsDashboard extends Component
         }
     }
 
+    public function placePredictionStake(): void
+    {
+        try {
+            $stake = app(CreatePredictionStakeAction::class)->handle(
+                StorePredictionStakeRequest::fromState(
+                    $this->selectedSymbol,
+                    $this->interval,
+                    $this->stakeTargetAt,
+                    $this->stakeTargetPrice,
+                    $this->stakeDirection,
+                    $this->stakeConfidence,
+                    $this->stakeNote,
+                ),
+            );
+
+            $this->stakeTargetPrice = '';
+            $this->stakeNote = '';
+            $this->resetStakeTargetTime();
+            $this->notice = 'Prediction stake saved for '.$stake->target_at
+                ->setTimezone(config('app.timezone'))
+                ->format('Y-m-d H:i');
+        } catch (Throwable $exception) {
+            $this->notice = $this->exceptionMessage($exception);
+        }
+    }
+
     public function render(
         BuildMarketBoardAction $boardBuilder,
         BuildMarketSeriesAction $chartBuilder,
@@ -186,6 +238,7 @@ class MarketsDashboard extends Component
             'candles' => $dashboard['candles'],
             'snapshots' => $dashboard['snapshots'],
             'forecast' => $dashboard['forecast'],
+            'predictionStakes' => $dashboard['predictionStakes'],
             'chart' => $chartBuilder->handle($dashboard['candles'], $dashboard['forecast'], $selectedAsset?->latestSnapshot),
         ]);
     }
@@ -234,5 +287,19 @@ class MarketsDashboard extends Component
             ->take(12)
             ->values()
             ->all();
+    }
+
+    private function resetStakeTargetTime(): void
+    {
+        $this->stakeTargetAt = StorePredictionStakeRequest::defaultTargetAt($this->interval);
+    }
+
+    private function exceptionMessage(Throwable $exception): string
+    {
+        if ($exception instanceof ValidationException) {
+            return (string) collect($exception->errors())->flatten()->first($exception->getMessage());
+        }
+
+        return $exception->getMessage();
     }
 }

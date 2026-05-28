@@ -46,6 +46,7 @@ return [
             'snapshots' => (int) env('CRYPTO_CACHE_SNAPSHOTS_SECONDS', 1),
             'latest_forecast' => (int) env('CRYPTO_CACHE_LATEST_FORECAST_SECONDS', 3),
             'forecast_stats' => (int) env('CRYPTO_CACHE_FORECAST_STATS_SECONDS', 2),
+            'prediction_stakes' => (int) env('CRYPTO_CACHE_PREDICTION_STAKES_SECONDS', 1),
         ],
         'warm_after_ticker_sync' => (bool) env('CRYPTO_CACHE_WARM_AFTER_TICKER_SYNC', true),
         'warm_limit' => (int) env('CRYPTO_CACHE_WARM_LIMIT', 3),

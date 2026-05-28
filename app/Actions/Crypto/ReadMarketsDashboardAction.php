@@ -5,6 +5,7 @@ namespace App\Actions\Crypto;
 use App\Models\CryptoAsset;
 use App\Models\CryptoCandle;
 use App\Models\CryptoForecast;
+use App\Models\CryptoPredictionStake;
 use App\Models\CryptoPriceSnapshot;
 use App\Services\Crypto\CryptoCache;
 use Illuminate\Support\Collection;
@@ -21,7 +22,8 @@ class ReadMarketsDashboardAction
      *     selectedAsset:?CryptoAsset,
      *     candles:Collection<int,CryptoCandle>,
      *     snapshots:Collection<int,CryptoPriceSnapshot>,
-     *     forecast:?CryptoForecast
+     *     forecast:?CryptoForecast,
+     *     predictionStakes:Collection<int,CryptoPredictionStake>
      * }
      */
     public function handle(string $selectedSymbol, string $interval): array
@@ -39,6 +41,7 @@ class ReadMarketsDashboardAction
             'candles' => $selectedAsset ? $this->candles($selectedAsset, $interval) : collect(),
             'snapshots' => $selectedAsset ? $this->snapshots($selectedAsset) : collect(),
             'forecast' => $selectedAsset ? $this->latestForecast($selectedAsset, $interval) : null,
+            'predictionStakes' => $selectedAsset ? $this->predictionStakes($selectedAsset, $interval) : collect(),
         ];
     }
 
@@ -128,6 +131,20 @@ class ReadMarketsDashboardAction
                 ->forInterval($interval)
                 ->latestCompleted()
                 ->first(),
+        );
+    }
+
+    /**
+     * @return Collection<int, CryptoPredictionStake>
+     */
+    private function predictionStakes(CryptoAsset $asset, string $interval): Collection
+    {
+        return $this->cache->rememberCollection(
+            "markets:prediction-stakes:{$asset->getKey()}:{$interval}:12",
+            'prediction_stakes',
+            fn () => CryptoPredictionStake::query()
+                ->dashboardList($asset, $interval, 12)
+                ->get(),
         );
     }
 }

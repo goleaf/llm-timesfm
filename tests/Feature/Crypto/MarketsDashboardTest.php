@@ -5,6 +5,8 @@ use App\Livewire\MarketsDashboard;
 use App\Models\CryptoAsset;
 use App\Models\CryptoForecast;
 use App\Models\CryptoForecastPoint;
+use App\Models\CryptoPredictionStake;
+use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -13,7 +15,14 @@ use function Pest\Laravel\get;
 
 uses(RefreshDatabase::class);
 
+afterEach(function (): void {
+    Carbon::setTestNow();
+});
+
 it('renders the realtime markets dashboard from stored market data', function (): void {
+    config()->set('app.timezone', 'UTC');
+    Carbon::setTestNow(CarbonImmutable::parse('2026-05-28 10:00:00 UTC'));
+
     $asset = CryptoAsset::factory()
         ->hasSnapshots(1, [
             'price' => '71000.500000000000',
@@ -46,6 +55,8 @@ it('renders the realtime markets dashboard from stored market data', function ()
         ->assertSee('Pair Finder')
         ->assertSee('Pinned Rates')
         ->assertSee('Live Ticks')
+        ->assertSee('Prediction Stake')
+        ->assertSee('Save prediction stake')
         ->assertSee('First currency')
         ->assertSee('Second currency')
         ->assertSee('wire:poll.visible.1000ms', false)
@@ -70,8 +81,18 @@ it('renders the realtime markets dashboard from stored market data', function ()
         ->assertSet('pinnedSymbols', ['ETHUSDT'])
         ->call('pinAsset', 'BTCUSDT')
         ->assertSet('pinnedSymbols', ['ETHUSDT', 'BTCUSDT'])
+        ->set('stakeTargetAt', '2026-05-28T10:05')
+        ->set('stakeTargetPrice', '72000.50')
+        ->set('stakeDirection', 'above')
+        ->set('stakeConfidence', 75)
+        ->set('stakeNote', 'breakout')
+        ->call('placePredictionStake')
+        ->assertSee('Prediction stake saved')
+        ->assertSee('Above target')
         ->assertSee('71,000.50')
         ->assertSee('Pinned Rates');
+
+    expect(CryptoPredictionStake::query()->count())->toBe(1);
 });
 
 it('renders realtime forecast statistics from evaluated forecast points', function (): void {

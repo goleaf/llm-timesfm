@@ -241,6 +241,128 @@
                 </section>
 
                 <section class="rounded-md border border-white/10 bg-[#111317]">
+                    <div class="flex items-center justify-between border-b border-white/10 px-4 py-3">
+                        <h2 class="text-sm font-semibold uppercase text-zinc-300">Prediction Stake</h2>
+                        <span class="text-xs text-zinc-500">{{ $predictionStakes->count() }} saved</span>
+                    </div>
+
+                    <form wire:submit.prevent="placePredictionStake" class="space-y-3 p-4">
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="block">
+                                <span class="text-xs text-zinc-500">Target time</span>
+                                <input
+                                    type="datetime-local"
+                                    wire:model.live="stakeTargetAt"
+                                    class="mt-1 h-10 w-full rounded-md border border-white/10 bg-black/30 px-3 text-sm font-semibold text-white outline-none focus:border-amber-300"
+                                >
+                            </label>
+                            <label class="block">
+                                <span class="text-xs text-zinc-500">Target price</span>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    step="0.00000001"
+                                    wire:model.live="stakeTargetPrice"
+                                    class="mt-1 h-10 w-full rounded-md border border-white/10 bg-black/30 px-3 text-sm font-semibold text-white outline-none focus:border-amber-300"
+                                    placeholder="{{ $board['selected']['price'] ?? '0.00' }}"
+                                >
+                            </label>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            @foreach ($stakeDirectionOptions as $value => $label)
+                                <button
+                                    type="button"
+                                    wire:key="stake-direction-{{ $value }}"
+                                    wire:click="$set('stakeDirection', '{{ $value }}')"
+                                    class="h-10 rounded-md border text-sm font-medium {{ $stakeDirection === $value ? 'border-amber-300 bg-amber-300 text-zinc-950' : 'border-white/10 bg-white/[0.04] text-zinc-200 hover:bg-white/[0.08]' }}"
+                                >
+                                    {{ $label }}
+                                </button>
+                            @endforeach
+                        </div>
+
+                        <div class="grid grid-cols-[minmax(0,1fr)_5rem] gap-2">
+                            <label class="block">
+                                <span class="text-xs text-zinc-500">Note</span>
+                                <input
+                                    type="text"
+                                    maxlength="160"
+                                    wire:model.live.debounce.250ms="stakeNote"
+                                    class="mt-1 h-10 w-full rounded-md border border-white/10 bg-black/30 px-3 text-sm text-white outline-none focus:border-amber-300"
+                                    placeholder="breakout"
+                                >
+                            </label>
+                            <label class="block">
+                                <span class="text-xs text-zinc-500">Confidence</span>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max="100"
+                                    wire:model.live="stakeConfidence"
+                                    class="mt-1 h-10 w-full rounded-md border border-white/10 bg-black/30 px-3 text-sm font-semibold text-white outline-none focus:border-amber-300"
+                                >
+                            </label>
+                        </div>
+
+                        <button type="submit" class="h-11 w-full rounded-md bg-amber-300 text-sm font-semibold text-zinc-950 hover:bg-amber-200">
+                            Save prediction stake
+                        </button>
+                    </form>
+
+                    <div class="max-h-72 overflow-auto border-t border-white/10">
+                        @forelse ($predictionStakes as $stake)
+                            @php
+                                $stakeStatusClass = match ($stake->status) {
+                                    'won' => 'border-emerald-300/25 bg-emerald-300/10 text-emerald-100',
+                                    'lost' => 'border-rose-300/25 bg-rose-300/10 text-rose-100',
+                                    default => 'border-cyan-300/25 bg-cyan-300/10 text-cyan-100',
+                                };
+                            @endphp
+                            <div wire:key="prediction-stake-{{ $stake->id }}" class="border-b border-white/5 px-4 py-3">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="min-w-0">
+                                        <p class="truncate text-sm font-semibold text-white">
+                                            {{ $stakeDirectionOptions[$stake->direction] ?? strtoupper($stake->direction) }}
+                                            {{ number_format((float) $stake->target_price, (float) $stake->target_price >= 1 ? 2 : 8) }}
+                                        </p>
+                                        <p class="mt-1 text-xs text-zinc-500">
+                                            {{ $stake->target_at->setTimezone(config('app.timezone'))->format('M d H:i') }} · {{ $stake->confidence }}%
+                                        </p>
+                                    </div>
+                                    <span class="rounded-md border px-2 py-1 text-[0.7rem] font-semibold uppercase {{ $stakeStatusClass }}">
+                                        {{ $stake->status }}
+                                    </span>
+                                </div>
+
+                                <div class="mt-2 grid grid-cols-2 gap-2 text-xs">
+                                    <div class="rounded-md bg-white/[0.035] px-2 py-1.5">
+                                        <span class="block text-zinc-500">Entry</span>
+                                        <span class="font-semibold text-zinc-100">{{ $stake->entry_price ? number_format((float) $stake->entry_price, (float) $stake->entry_price >= 1 ? 2 : 8) : 'open' }}</span>
+                                    </div>
+                                    <div class="rounded-md bg-white/[0.035] px-2 py-1.5">
+                                        <span class="block text-zinc-500">Actual</span>
+                                        <span class="font-semibold text-zinc-100">{{ $stake->actual_price ? number_format((float) $stake->actual_price, (float) $stake->actual_price >= 1 ? 2 : 8) : 'pending' }}</span>
+                                    </div>
+                                </div>
+
+                                @if ($stake->absolute_percentage_error)
+                                    <p class="mt-2 text-xs text-zinc-500">
+                                        Error {{ number_format((float) $stake->absolute_percentage_error, 4) }}%
+                                    </p>
+                                @endif
+
+                                @if ($stake->note)
+                                    <p class="mt-2 truncate text-xs text-zinc-400">{{ $stake->note }}</p>
+                                @endif
+                            </div>
+                        @empty
+                            <div class="px-4 py-8 text-sm text-zinc-500">No prediction stakes yet.</div>
+                        @endforelse
+                    </div>
+                </section>
+
+                <section class="rounded-md border border-white/10 bg-[#111317]">
                     <div class="border-b border-white/10 px-4 py-3">
                         <h2 class="text-sm font-semibold uppercase text-zinc-300">Forecast Desk</h2>
                     </div>
