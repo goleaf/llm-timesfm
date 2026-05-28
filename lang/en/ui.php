@@ -77,6 +77,7 @@ return [
         'engines_points' => ':engines engines / :points points',
         'checked_points' => ':checked/:total checked',
         'no_forecast' => 'No forecast stored.',
+        'market_pulse_chart' => 'Market movement mini chart',
         'zoom_out' => 'Zoom out',
         'zoom_in' => 'Zoom in',
         'reset_zoom' => 'Reset zoom',

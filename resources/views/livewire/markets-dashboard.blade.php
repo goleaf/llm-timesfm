@@ -133,7 +133,18 @@
                                     <span class="truncate text-zinc-500">{{ $row['symbol'] }} · {{ $row['updated_at'] }}</span>
                                     <span class="text-right font-semibold {{ $row['change_positive'] ? 'text-emerald-300' : 'text-rose-300' }}">{{ $row['change'] }}</span>
                                 </span>
-                                <span class="mt-1 block text-lg font-semibold text-zinc-100">{{ $row['price'] }}</span>
+                                <span class="mt-2 grid grid-cols-[minmax(0,1fr)_7rem] items-end gap-3">
+                                    <span class="block text-lg font-semibold text-zinc-100">{{ $row['price'] }}</span>
+                                    <svg data-market-pulse-chart viewBox="0 0 120 40" role="img" aria-label="{{ __('ui.market.market_pulse_chart') }}" class="h-10 w-full overflow-visible rounded border border-white/10 bg-black/25">
+                                        <line x1="6" y1="{{ $row['pulse_chart']['baseline_y'] }}" x2="114" y2="{{ $row['pulse_chart']['baseline_y'] }}" stroke="#3f3f46" stroke-width="1" stroke-dasharray="3 4"></line>
+                                        <rect x="6" y="{{ $row['pulse_chart']['range_top'] }}" width="108" height="{{ $row['pulse_chart']['range_height'] }}" fill="{{ $row['change_positive'] ? '#34d399' : '#fb7185' }}" opacity="0.08"></rect>
+
+                                        @if ($row['pulse_chart']['has_data'])
+                                            <polyline points="{{ $row['pulse_chart']['points'] }}" fill="none" stroke="{{ $row['pulse_chart']['stroke'] }}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                                            <circle cx="{{ $row['pulse_chart']['current_x'] }}" cy="{{ $row['pulse_chart']['current_y'] }}" r="3" fill="{{ $row['pulse_chart']['stroke'] }}" stroke="#09090b" stroke-width="1.25"></circle>
+                                        @endif
+                                    </svg>
+                                </span>
                             </button>
 
                             @if ($row['is_pinned'])

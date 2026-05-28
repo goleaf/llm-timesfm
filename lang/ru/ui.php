@@ -77,6 +77,7 @@ return [
         'engines_points' => ':engines движков / :points точек',
         'checked_points' => 'проверено :checked/:total',
         'no_forecast' => 'Прогнозов нет.',
+        'market_pulse_chart' => 'Мини-график движения рынка',
         'zoom_out' => 'Уменьшить',
         'zoom_in' => 'Увеличить',
         'reset_zoom' => 'Сбросить zoom',

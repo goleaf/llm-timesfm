@@ -15,6 +15,7 @@ Public repository: `https://github.com/goleaf/llm-timesfm`
 - Shows interactive SVG charts with zoom controls, wheel zoom, drag panning, always-visible scale labels, latest markers, analyzer labels, metric panels, point ledgers, and hover tooltips for deeper candle, live price, forecast, and forecast-accuracy details.
 - Uses a shared workbench interface for all public screens with sticky headers, dense panels, styled chart surfaces, consistent scroll areas, hoverable data rows, and a wide Full HD layout.
 - The market workspace includes a source-driven first-currency list, pair finder, pinned rates, chart workspace, visible analysis points, live tick feed, prediction stake panel, and forecast desk.
+- The left market list shows a mini movement chart for each visible pair beside its live price, update time, and 24-hour change.
 - Runs scheduled automation for market updates, missing candle backfill, forecast creation, and forecast evaluation.
 - Keeps the project open: no login, no user accounts, no private panels.
 - Keeps public pages as full-page Livewire components. Volt and standard controllers are intentionally not used.
@@ -56,6 +57,7 @@ The scheduled automation keeps the local SQLite database fresh:
 ## Market Dashboard
 
 - Pair Finder searches by first and second currency, and the First currency field shows a live list from stored source data with direct pin controls for the best matching pair.
+- Each market row in the left list includes a compact live movement chart built from the latest stored market snapshot.
 - Pinned rates can be added or removed directly from the dashboard and are remembered for the current browser session.
 - The interface is Russian-first, and the floating RU / EN switcher changes the current browser session without requiring accounts or a reload-heavy settings page.
 - The public screens share the same workbench visual layer so market, analysis, and statistics pages feel like one dashboard instead of separate narrow pages.

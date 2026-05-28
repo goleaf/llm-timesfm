@@ -3,6 +3,7 @@
 namespace App\Actions\Crypto;
 
 use App\Models\CryptoAsset;
+use App\Models\CryptoPriceSnapshot;
 use Illuminate\Support\Collection;
 
 class BuildMarketBoardAction
@@ -80,8 +81,71 @@ class BuildMarketBoardAction
             'trades' => number_format((int) ($snapshot?->trade_count ?? 0)),
             'change' => $this->signedPercent($snapshot?->price_change_percent ?? $change),
             'change_positive' => (float) ($snapshot?->price_change_percent ?? $change) >= 0,
+            'pulse_chart' => $this->pulseChart($snapshot),
             'updated_at' => $snapshot?->source_event_at?->format('H:i:s') ?? 'waiting',
             'updated_full' => $snapshot?->source_event_at?->toDayDateTimeString() ?? __('ui.common.waiting_for_live_data'),
+        ];
+    }
+
+    /**
+     * @return array{
+     *     has_data:bool,
+     *     points:string,
+     *     baseline_y:float,
+     *     range_top:float,
+     *     range_height:float,
+     *     current_x:float,
+     *     current_y:float,
+     *     stroke:string
+     * }
+     */
+    private function pulseChart(?CryptoPriceSnapshot $snapshot): array
+    {
+        $open = (float) ($snapshot?->open_price ?? 0);
+        $last = (float) ($snapshot?->price ?? 0);
+        $high = (float) ($snapshot?->high_price ?? 0);
+        $low = (float) ($snapshot?->low_price ?? 0);
+        $middle = (float) ($snapshot?->weighted_avg_price ?? 0);
+        $middle = $middle > 0 ? $middle : (($open > 0 && $last > 0) ? ($open + $last) / 2 : max($open, $last));
+        $values = collect([$open, $middle, $last, $high, $low])
+            ->filter(fn (float $value): bool => $value > 0)
+            ->values();
+
+        if ($values->isEmpty()) {
+            return [
+                'has_data' => false,
+                'points' => '',
+                'baseline_y' => 20.0,
+                'range_top' => 18.0,
+                'range_height' => 4.0,
+                'current_x' => 112.0,
+                'current_y' => 20.0,
+                'stroke' => '#a1a1aa',
+            ];
+        }
+
+        $floor = (float) $values->min();
+        $ceiling = (float) $values->max();
+        $spread = max($ceiling - $floor, abs($ceiling) * 0.001, 1.0);
+        $scale = fn (float $value): float => round(34 - (($value - $floor) / $spread) * 28, 2);
+        $points = [
+            [6.0, $scale($open > 0 ? $open : $floor)],
+            [42.0, $scale($middle)],
+            [78.0, $scale($last > 0 ? $last : $middle)],
+            [114.0, $scale($last > 0 ? $last : $middle)],
+        ];
+
+        return [
+            'has_data' => true,
+            'points' => collect($points)
+                ->map(fn (array $point): string => $point[0].','.$point[1])
+                ->implode(' '),
+            'baseline_y' => $scale($open > 0 ? $open : $floor),
+            'range_top' => $scale($ceiling),
+            'range_height' => max(2.0, $scale($floor) - $scale($ceiling)),
+            'current_x' => 114.0,
+            'current_y' => $scale($last > 0 ? $last : $middle),
+            'stroke' => $last >= $open ? '#34d399' : '#fb7185',
         ];
     }
 

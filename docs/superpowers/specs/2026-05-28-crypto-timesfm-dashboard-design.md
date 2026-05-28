@@ -20,6 +20,8 @@ Charts are rendered as SVG from server-built point payloads. Each payload contai
 
 The market screen targets Full HD workstations. It uses a wide shell with a left pair finder, source-driven first-currency list with pin controls, central chart workspace, live tick feed, right-side pinned rates, and forecast desk. The visible interface is market-focused and does not show raw payload blocks.
 
+The left market list includes compact movement charts for visible pairs. Those mini charts are built from action-prepared latest snapshot fields and rendered as small SVGs beside the existing live price, update time, and change values.
+
 The forecast statistics screen is a full diagnostic surface, not a small summary. It shows market context, source counts, coverage, MAPE, MAE, direction accuracy, engine breakdowns, ranked best and worst points, evaluated point details, pending target rows, and forecast-run windows from preloaded action data.
 
 All public dashboard screens share a workbench visual layer. The market, analysis, and statistics pages use the same sticky header treatment, dense panel surfaces, chart framing, custom scroll regions, hoverable data rows, and wide monitor spacing so the application reads as one operational tool.

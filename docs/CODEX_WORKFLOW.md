@@ -56,6 +56,8 @@ The forecast statistics screen must stay information-dense. It should show marke
 
 The market dashboard is designed for Full HD use: a wide shell, pair finder, source-driven first-currency list with pin controls, pinned rates, main chart workspace with visible analyzer forecast points, live tick feed, prediction stake panel, and forecast desk. Avoid returning it to a narrow centered dashboard or visible raw payload panel.
 
+The left market list should keep compact movement charts on visible market rows. Build their chart payload in actions from already loaded market data, then render SVG in Livewire without Blade-side calculations or extra row queries.
+
 The public workbench uses shared dashboard styling for sticky headers, panel surfaces, chart areas, custom scroll regions, and hoverable data rows. New public Livewire screens should reuse this style instead of inventing a separate visual system.
 
 The public interface is Russian-first. All user-facing dashboard labels, action messages, chart payload labels, analysis pages, and statistics pages must have Russian and English strings. Do not hardcode new public copy in Livewire views or actions unless it is market data, a symbol, a technical abbreviation, or a user-entered value.
