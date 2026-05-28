@@ -74,3 +74,11 @@
 - [x] Add composite indexes for realtime dashboard and forecast-evaluation query patterns.
 - [x] Use bulk upserts for repeated Binance JSON imports.
 - [x] Add tests for indexes, cache hits, cache invalidation, warming, and duplicate-safe imports.
+
+### Task 10: Interactive Charts
+
+- [x] Add hover tooltips for market, forecast, and forecast-accuracy charts.
+- [x] Show the nearest point marker and vertical guide line on mouse hover.
+- [x] Include candle, live ticker, forecast, actual, and error details in chart payloads.
+- [x] Append the latest ticker snapshot to the market chart so it updates every second between candle closes.
+- [x] Preserve hover feedback after Livewire polling morphs the DOM.

@@ -14,6 +14,8 @@ The project is public and Livewire-only. It intentionally has no authentication 
 
 The realtime read path is cached through short-lived Laravel cache entries. SQLite remains the local source of truth and runs with WAL-oriented settings, while Redis can be used as a faster cache store when available. Scheduler-driven ticker updates refresh market data and warm the most common dashboard reads so Livewire polling does not repeat the same database work for every viewer.
 
+Charts are rendered as SVG from server-built point payloads. Each payload contains the visible polyline coordinates and the hover rows for every point. Browser JavaScript only reads that payload, finds the nearest point under the mouse, and shows a marker, guide line, and data tooltip. The market chart adds the latest ticker snapshot as a live point so the graph can move every second even when the candle interval has not closed yet.
+
 ## Data Flow
 
 1. The scheduler fetches configured Binance symbols from `/api/v3/ticker/24hr`.
@@ -24,6 +26,7 @@ The realtime read path is cached through short-lived Laravel cache entries. SQLi
 6. The evaluator compares forecast points with actual candle closes when the target candles exist.
 7. The statistics dashboard shows evaluated forecast quality with live-updating charts.
 8. Cache warming prepares the most common market and statistics reads after ticker updates.
+9. Chart hover payloads expose detailed candle, live ticker, forecast, actual, and error values without querying from Blade.
 
 ## Constraints
 

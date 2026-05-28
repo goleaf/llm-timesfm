@@ -9,6 +9,7 @@ Public repository: `https://github.com/goleaf/llm-timesfm`
 - Reads public Binance Spot JSON data.
 - Stores market snapshots, short candle history, forecasts, and forecast accuracy locally.
 - Shows real-time Livewire screens without page reloads.
+- Shows interactive SVG charts with hover tooltips for candle, live price, forecast, and forecast-accuracy details.
 - Runs scheduled automation for market updates, missing candle backfill, forecast creation, and forecast evaluation.
 - Keeps the project open: no login, no user accounts, no private panels.
 - Keeps public pages as full-page Livewire components. Volt and standard controllers are intentionally not used.
@@ -41,6 +42,7 @@ The scheduled automation keeps the local SQLite database fresh:
 - short candle gaps are filled every minute
 - stored forecasts are evaluated every minute when real candles are available
 - new short-range forecasts are created every five minutes
+- the market chart includes the latest ticker snapshot as a live point, so it can update every second between candle closes
 
 ## Performance
 

@@ -4,6 +4,7 @@ This file is the human-readable history of the project. It must be updated after
 
 ## 2026-05-28
 
+- Added detailed interactive chart hover behavior so market and forecast-statistics graphs show the nearest point, a marker, a guide line, and full point details; the market graph now includes the latest live ticker point so it can refresh every second between candle closes.
 - Added faster local database settings, Redis-compatible dashboard caching, automatic cache warming, bulk market-data writes, and extra performance tests so the real-time screens can keep updating smoothly as stored market history grows.
 - Refreshed the project documentation so every Markdown file now points to the public repository, describes the Livewire-only rule, explains the automated market pipeline, and records the required commit-and-push workflow.
 - Converted the project into an open public crypto forecasting dashboard with no login, registration, user accounts, password reset, or private access flow.

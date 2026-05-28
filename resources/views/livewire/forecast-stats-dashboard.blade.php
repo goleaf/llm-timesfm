@@ -100,7 +100,7 @@
                     </div>
 
                     <div class="grid gap-4 p-4 xl:grid-cols-[minmax(0,1fr)_18rem]">
-                        <div class="h-[22rem] overflow-hidden rounded-md border border-white/10 bg-zinc-950">
+                        <div data-interactive-chart class="relative h-[22rem] overflow-hidden rounded-md border border-white/10 bg-zinc-950">
                             <svg viewBox="0 0 720 260" role="img" class="h-full w-full">
                                 <rect width="720" height="260" fill="#09090b"></rect>
                                 <line x1="18" y1="242" x2="702" y2="242" stroke="#3f3f46" stroke-width="1"></line>
@@ -113,10 +113,16 @@
                                 @if ($chart['actual'])
                                     <polyline points="{{ $chart['actual'] }}" fill="none" stroke="#22d3ee" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
                                 @endif
+
+                                <line data-chart-guide class="hidden" y1="18" y2="242" stroke="#f8fafc" stroke-width="1" stroke-dasharray="4 5" opacity="0.72"></line>
+                                <circle data-chart-marker class="hidden" r="5" fill="#f8fafc" stroke="#09090b" stroke-width="2"></circle>
+                                <rect x="0" y="0" width="720" height="260" fill="transparent"></rect>
                             </svg>
+                            <div data-chart-tooltip class="pointer-events-none absolute z-20 hidden max-w-72 rounded-md border border-white/15 bg-zinc-950/95 px-3 py-2 text-xs text-zinc-100 shadow-2xl shadow-black/40"></div>
+                            <script type="application/json" data-chart-payload>{!! json_encode($chart['tooltip'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}</script>
                         </div>
 
-                        <div class="h-[22rem] overflow-hidden rounded-md border border-white/10 bg-zinc-950">
+                        <div data-interactive-chart class="relative h-[22rem] overflow-hidden rounded-md border border-white/10 bg-zinc-950">
                             <div class="border-b border-white/10 px-3 py-2">
                                 <p class="text-sm font-semibold text-white">Error %</p>
                                 <p class="mt-1 text-xs text-zinc-400">Max {{ $formatPercent($chart['error_max']) }}</p>
@@ -128,7 +134,13 @@
                                 @if ($chart['error'])
                                     <polyline points="{{ $chart['error'] }}" fill="none" stroke="#fb7185" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
                                 @endif
+
+                                <line data-chart-guide class="hidden" y1="18" y2="242" stroke="#f8fafc" stroke-width="1" stroke-dasharray="4 5" opacity="0.72"></line>
+                                <circle data-chart-marker class="hidden" r="5" fill="#f8fafc" stroke="#09090b" stroke-width="2"></circle>
+                                <rect x="0" y="0" width="720" height="260" fill="transparent"></rect>
                             </svg>
+                            <div data-chart-tooltip class="pointer-events-none absolute z-20 hidden max-w-72 rounded-md border border-white/15 bg-zinc-950/95 px-3 py-2 text-xs text-zinc-100 shadow-2xl shadow-black/40"></div>
+                            <script type="application/json" data-chart-payload>{!! json_encode($chart['error_tooltip'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}</script>
                         </div>
                     </div>
                 </div>

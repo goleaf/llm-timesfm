@@ -41,7 +41,12 @@ it('renders the realtime markets dashboard from stored market data', function ()
     get('/markets')
         ->assertOk()
         ->assertSee('Crypto Forecast')
-        ->assertSee('BTC/USDT');
+        ->assertSee('BTC/USDT')
+        ->assertSee('wire:poll.1000ms', false)
+        ->assertSee('data-interactive-chart', false)
+        ->assertSee('data-chart-payload', false)
+        ->assertSee('Live price', false)
+        ->assertSee('Candle close', false);
 
     Livewire::test(MarketsDashboard::class)
         ->call('selectAsset', $asset->symbol)
@@ -111,7 +116,11 @@ it('renders realtime forecast statistics from evaluated forecast points', functi
     get('/markets/stats/BTCUSDT')
         ->assertOk()
         ->assertSee('Prediction Statistics')
-        ->assertSee('BTC/USDT');
+        ->assertSee('BTC/USDT')
+        ->assertSee('data-interactive-chart', false)
+        ->assertSee('data-chart-payload', false)
+        ->assertSee('Predicted', false)
+        ->assertSee('Forecast error', false);
 
     Livewire::test(ForecastStatsDashboard::class, ['symbol' => 'BTCUSDT'])
         ->assertSet('selectedSymbol', 'BTCUSDT')

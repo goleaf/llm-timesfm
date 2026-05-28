@@ -15,6 +15,7 @@ This project is built as a Livewire-only public application.
 - Keep all Markdown files aligned with the actual project state.
 - Keep real-time reads behind short-lived cache actions instead of rebuilding the same dashboard queries in Livewire.
 - Keep import writes batched where possible so repeated public JSON updates do not become per-row query loops.
+- Keep chart interactivity data-driven: Livewire renders chart payload JSON, and browser JavaScript only handles pointer interaction.
 
 ## End Of Prompt Checklist
 
@@ -43,6 +44,8 @@ Write for a project owner, not for a compiler.
 
 - Market dashboard: `https://llm-timesfm.test/markets`
 - Forecast statistics: `https://llm-timesfm.test/markets/stats/BTCUSDT`
+
+Both screens use interactive SVG charts. Hovering a chart shows the nearest stored point, guide line, marker, timestamp, values, volumes, forecast data, or error statistics depending on the chart.
 
 ## Current Performance Defaults
 
