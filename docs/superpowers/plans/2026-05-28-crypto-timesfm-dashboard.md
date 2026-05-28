@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Ship a local realtime crypto dashboard with Binance JSON history, TimesFM-compatible forecasting, and forecast accuracy tracking.
+**Goal:** Ship a local realtime crypto dashboard with Binance market history, TimesFM-compatible forecasting, and forecast accuracy tracking.
 
 **Architecture:** Laravel commands ingest Binance data into SQLite through Eloquent actions. Full-page Livewire components render from local models with polling. Forecasts are delegated to a Python bridge, stored as forecast runs and forecast points, then compared against later candles.
 
@@ -34,7 +34,7 @@
 
 - [x] Add a full-page `MarketsDashboard` component.
 - [x] Add the `/markets/{symbol?}` route group.
-- [x] Render market list, selected market stats, SVG chart, JSON snapshot history, and forecast panel.
+- [x] Render market list, selected market stats, SVG chart, live market history, and forecast panel.
 - [x] Keep Blade query-free; all data is passed from the component.
 
 ### Task 5: TimesFM Bridge
@@ -86,9 +86,9 @@
 ### Task 11: Full HD Market Workspace
 
 - [x] Widen the market and statistics dashboards for Full HD monitors.
-- [x] Split the market dashboard into market list, chart workspace, and JSON inspector columns.
-- [x] Replace the narrow raw JSON history block with structured snapshot sections.
-- [x] Keep raw fields and raw JSON available for inspection without making them the primary view.
+- [x] Split the market dashboard into pair finder, chart workspace, pinned rates, live tick feed, and forecast desk.
+- [x] Remove visible raw payload panels from the market interface.
+- [x] Keep source payloads stored locally while showing trading-friendly fields on screen.
 
 ### Task 12: Request And Action Architecture
 
@@ -96,3 +96,10 @@
 - [x] Move market history loading and forecast-button behavior out of Livewire and into actions.
 - [x] Move command orchestration for syncs, backfills, forecast cycles, and watch loops into actions.
 - [x] Add tests that verify invalid dashboard input is ignored and command payloads are validated before actions run.
+
+### Task 13: Pinned Pair Dashboard
+
+- [x] Add first-currency and second-currency filters to the left pair finder.
+- [x] Add browser-session pinned rates that can be added and removed from the dashboard.
+- [x] Keep pinned rates, live ticks, chart data, and forecast controls inside the same one-second Livewire update surface.
+- [x] Rebuild the market screen using a restrained technical dashboard design.

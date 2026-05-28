@@ -10,7 +10,7 @@ Public repository: `https://github.com/goleaf/llm-timesfm`
 - Stores market snapshots, short candle history, forecasts, and forecast accuracy locally.
 - Shows real-time Livewire screens without page reloads.
 - Shows interactive SVG charts with hover tooltips for candle, live price, forecast, and forecast-accuracy details.
-- Uses a wide Full HD dashboard layout with a dedicated market list, chart workspace, and structured JSON inspector column.
+- Uses a wide Full HD dashboard layout with a pair finder, pinned rates, chart workspace, live tick feed, and forecast desk.
 - Runs scheduled automation for market updates, missing candle backfill, forecast creation, and forecast evaluation.
 - Keeps the project open: no login, no user accounts, no private panels.
 - Keeps public pages as full-page Livewire components. Volt and standard controllers are intentionally not used.
@@ -46,11 +46,11 @@ The scheduled automation keeps the local SQLite database fresh:
 - new short-range forecasts are created every five minutes
 - the market chart includes the latest ticker snapshot as a live point, so it can update every second between candle closes
 
-## Market Inspector
+## Market Dashboard
 
-- Ticker JSON history is shown as structured snapshot cards instead of a narrow raw JSON block.
-- Each snapshot includes price, order book, volume, exchange event, raw field, and raw JSON sections.
-- The first recent snapshot opens by default so the latest market payload is visible immediately on wide screens.
+- Pair Finder searches by first and second currency so active pairs are easy to locate.
+- Pinned rates can be added or removed directly from the dashboard and are remembered for the current browser session.
+- The visible interface shows market rows, live ticks, charts, pinned rates, and forecasts; raw payload blocks are not shown on the screen.
 
 ## Performance
 

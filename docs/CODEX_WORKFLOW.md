@@ -49,7 +49,7 @@ Write for a project owner, not for a compiler.
 
 Both screens use interactive SVG charts. Hovering a chart shows the nearest stored point, guide line, marker, timestamp, values, volumes, forecast data, or error statistics depending on the chart.
 
-The market dashboard is designed for Full HD use: a wide shell, separate market list, main chart workspace, and structured JSON inspector column. Avoid returning it to a narrow centered dashboard.
+The market dashboard is designed for Full HD use: a wide shell, pair finder, pinned rates, main chart workspace, live tick feed, and forecast desk. Avoid returning it to a narrow centered dashboard or visible raw payload panel.
 
 ## Current Performance Defaults
 

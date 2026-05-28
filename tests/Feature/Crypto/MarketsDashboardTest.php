@@ -40,15 +40,20 @@ it('renders the realtime markets dashboard from stored market data', function ()
 
     get('/markets')
         ->assertOk()
-        ->assertSee('Crypto Forecast')
+        ->assertSee('Crypto Dashboard')
         ->assertSee('BTC/USDT')
         ->assertSee('max-w-[120rem]', false)
-        ->assertSee('Structured JSON History')
-        ->assertSee('Raw fields')
-        ->assertSee('Order book')
-        ->assertSee('wire:poll.1000ms', false)
+        ->assertSee('Pair Finder')
+        ->assertSee('Pinned Rates')
+        ->assertSee('Live Ticks')
+        ->assertSee('First currency')
+        ->assertSee('Second currency')
+        ->assertSee('wire:poll.visible.1000ms', false)
         ->assertSee('data-interactive-chart', false)
         ->assertSee('data-chart-payload', false)
+        ->assertDontSee('Structured JSON History')
+        ->assertDontSee('Raw JSON')
+        ->assertDontSee('Raw fields')
         ->assertSee('Live price', false)
         ->assertSee('Candle close', false);
 
@@ -61,8 +66,12 @@ it('renders the realtime markets dashboard from stored market data', function ()
         ->assertSet('forecastPeriod', '1h')
         ->call('selectAsset', 'bad-symbol!')
         ->assertSet('selectedSymbol', 'BTCUSDT')
+        ->call('unpinAsset', 'BTCUSDT')
+        ->assertSet('pinnedSymbols', ['ETHUSDT'])
+        ->call('pinAsset', 'BTCUSDT')
+        ->assertSet('pinnedSymbols', ['ETHUSDT', 'BTCUSDT'])
         ->assertSee('71,000.50')
-        ->assertSee('Structured JSON History');
+        ->assertSee('Pinned Rates');
 });
 
 it('renders realtime forecast statistics from evaluated forecast points', function (): void {
@@ -128,6 +137,7 @@ it('renders realtime forecast statistics from evaluated forecast points', functi
         ->assertSee('Prediction Statistics')
         ->assertSee('BTC/USDT')
         ->assertSee('max-w-[120rem]', false)
+        ->assertSee('wire:poll.visible.1000ms', false)
         ->assertSee('data-interactive-chart', false)
         ->assertSee('data-chart-payload', false)
         ->assertSee('Predicted', false)

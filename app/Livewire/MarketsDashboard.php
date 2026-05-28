@@ -2,8 +2,8 @@
 
 namespace App\Livewire;
 
+use App\Actions\Crypto\BuildMarketBoardAction;
 use App\Actions\Crypto\BuildMarketSeriesAction;
-use App\Actions\Crypto\BuildSnapshotHistoryRowsAction;
 use App\Actions\Crypto\EnsureMarketHistoryAction;
 use App\Actions\Crypto\LoadMarketHistoryAction;
 use App\Actions\Crypto\ReadMarketsDashboardAction;
@@ -25,6 +25,15 @@ class MarketsDashboard extends Component
 
     public ?string $notice = null;
 
+    public string $baseSearch = '';
+
+    public string $quoteSearch = '';
+
+    /**
+     * @var array<int, string>
+     */
+    public array $pinnedSymbols = [];
+
     /**
      * @var array<string, string>
      */
@@ -44,6 +53,7 @@ class MarketsDashboard extends Component
         $this->forecastPeriod = $request->forecastPeriod;
         $this->intervalOptions = MarketsDashboardRequest::intervalOptions();
         $this->forecastOptions = MarketsDashboardRequest::forecastOptions();
+        $this->pinnedSymbols = $this->storedPinnedSymbols();
     }
 
     public function refreshMarket(): void
@@ -87,6 +97,47 @@ class MarketsDashboard extends Component
         $this->forecastPeriod = $request->forecastPeriod;
     }
 
+    public function setBaseSearch(string $baseAsset): void
+    {
+        $this->baseSearch = strtoupper(trim($baseAsset));
+    }
+
+    public function setQuoteSearch(string $quoteAsset): void
+    {
+        $this->quoteSearch = strtoupper(trim($quoteAsset));
+    }
+
+    public function clearPairSearch(): void
+    {
+        $this->baseSearch = '';
+        $this->quoteSearch = '';
+    }
+
+    public function pinAsset(string $symbol): void
+    {
+        if (! $this->dashboardRequest()->withSymbol($symbol)) {
+            return;
+        }
+
+        $this->pinnedSymbols = $this->normalizePinnedSymbols([
+            ...$this->pinnedSymbols,
+            strtoupper($symbol),
+        ]);
+        $this->persistPinnedSymbols();
+    }
+
+    public function unpinAsset(string $symbol): void
+    {
+        $symbol = strtoupper($symbol);
+        $this->pinnedSymbols = $this->normalizePinnedSymbols(
+            array_values(array_filter(
+                $this->pinnedSymbols,
+                fn (string $pinnedSymbol): bool => $pinnedSymbol !== $symbol,
+            )),
+        );
+        $this->persistPinnedSymbols();
+    }
+
     public function loadHistory(): void
     {
         try {
@@ -109,13 +160,20 @@ class MarketsDashboard extends Component
     }
 
     public function render(
+        BuildMarketBoardAction $boardBuilder,
         BuildMarketSeriesAction $chartBuilder,
-        BuildSnapshotHistoryRowsAction $snapshotRows,
         ReadMarketsDashboardAction $reader,
     ): View {
         $request = $this->dashboardRequest();
         $dashboard = $reader->handle($request->symbol, $request->interval);
         $selectedAsset = $dashboard['selectedAsset'];
+        $board = $boardBuilder->handle(
+            $dashboard['assets'],
+            $this->pinnedSymbols,
+            $this->baseSearch,
+            $this->quoteSearch,
+            $selectedAsset,
+        );
 
         if ($selectedAsset && $this->selectedSymbol !== $selectedAsset->symbol) {
             $this->selectedSymbol = $selectedAsset->symbol;
@@ -123,10 +181,10 @@ class MarketsDashboard extends Component
 
         return view('livewire.markets-dashboard', [
             'assets' => $dashboard['assets'],
+            'board' => $board,
             'selectedAsset' => $selectedAsset,
             'candles' => $dashboard['candles'],
             'snapshots' => $dashboard['snapshots'],
-            'snapshotRows' => $snapshotRows->handle($dashboard['snapshots']),
             'forecast' => $dashboard['forecast'],
             'chart' => $chartBuilder->handle($dashboard['candles'], $dashboard['forecast'], $selectedAsset?->latestSnapshot),
         ]);
@@ -144,5 +202,37 @@ class MarketsDashboard extends Component
         } catch (Throwable $exception) {
             $this->notice = $exception->getMessage();
         }
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function storedPinnedSymbols(): array
+    {
+        $stored = session('crypto.pinned_symbols');
+
+        return $this->normalizePinnedSymbols(is_array($stored) && $stored !== []
+            ? $stored
+            : array_slice(config('crypto.binance.symbols', []), 0, 2));
+    }
+
+    private function persistPinnedSymbols(): void
+    {
+        session(['crypto.pinned_symbols' => $this->pinnedSymbols]);
+    }
+
+    /**
+     * @param  array<int, mixed>  $symbols
+     * @return array<int, string>
+     */
+    private function normalizePinnedSymbols(array $symbols): array
+    {
+        return collect($symbols)
+            ->map(fn (mixed $symbol): string => strtoupper(trim((string) $symbol)))
+            ->filter(fn (string $symbol): bool => preg_match('/^[A-Z0-9]{2,20}$/', $symbol) === 1)
+            ->unique()
+            ->take(12)
+            ->values()
+            ->all();
     }
 }
