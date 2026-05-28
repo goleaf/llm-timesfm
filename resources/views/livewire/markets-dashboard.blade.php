@@ -141,8 +141,8 @@
                             <button type="button" wire:click="loadHistory" class="h-9 rounded-md bg-white px-3 text-sm font-semibold text-zinc-950 hover:bg-zinc-200">
                                 Load history
                             </button>
-                            <a href="{{ route('markets.stats', ['symbol' => $selectedAsset?->symbol]) }}" class="h-9 rounded-md border border-white/10 px-3 py-2 text-sm font-semibold text-zinc-200 hover:bg-white/[0.06]">
-                                Statistics
+                            <a href="{{ route('markets.analyses', ['symbol' => $selectedAsset?->symbol]) }}" class="h-9 rounded-md border border-white/10 px-3 py-2 text-sm font-semibold text-zinc-200 hover:bg-white/[0.06]">
+                                Analyses
                             </a>
                         </div>
                     </div>
@@ -177,9 +177,13 @@
                                     <polyline points="{{ $chart['history'] }}" fill="none" stroke="#22d3ee" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
                                 @endif
 
-                                @if ($chart['forecast'])
-                                    <polyline points="{{ $chart['forecast'] }}" fill="none" stroke="#fbbf24" stroke-width="3" stroke-dasharray="8 7" stroke-linecap="round" stroke-linejoin="round"></polyline>
-                                @endif
+                                @foreach ($chart['forecast_series'] as $series)
+                                    <polyline points="{{ $series['polyline'] }}" fill="none" stroke="{{ $series['color'] }}" stroke-width="2.5" stroke-dasharray="8 7" stroke-linecap="round" stroke-linejoin="round"></polyline>
+
+                                    @foreach ($series['points'] as $point)
+                                        <circle cx="{{ $point['x'] }}" cy="{{ $point['y'] }}" r="3.5" fill="{{ $series['color'] }}" stroke="#0b0d10" stroke-width="1.25"></circle>
+                                    @endforeach
+                                @endforeach
 
                                 <line data-chart-guide class="hidden" y1="18" y2="242" stroke="#f8fafc" stroke-width="1" stroke-dasharray="4 5" opacity="0.72"></line>
                                 <circle data-chart-marker class="hidden" r="5" fill="#f8fafc" stroke="#0b0d10" stroke-width="2"></circle>
@@ -385,19 +389,23 @@
                             Run forecast
                         </button>
 
-                        @if ($forecast)
+                        @if ($forecasts->isNotEmpty())
                             <div class="rounded-md border border-white/10 bg-white/[0.04] p-3">
-                                <p class="text-xs text-zinc-500">{{ $forecast->completed_at?->toDayDateTimeString() }}</p>
-                                <p class="mt-1 text-sm font-semibold text-white">{{ $forecast->source }} / {{ $forecast->horizon }} points</p>
-                                <div class="mt-3 max-h-52 overflow-auto text-xs text-zinc-300">
-                                    @forelse ($forecast->point_forecast ?? [] as $index => $value)
-                                        <div class="flex justify-between border-b border-white/5 py-1">
-                                            <span>#{{ $index + 1 }}</span>
-                                            <span>{{ number_format((float) $value, (float) $value >= 1 ? 2 : 8) }}</span>
+                                <p class="text-xs text-zinc-500">Latest automatic analyses</p>
+                                <p class="mt-1 text-sm font-semibold text-white">{{ $forecasts->count() }} engines / {{ $forecast?->horizon ?? 0 }} points</p>
+                                <div class="mt-3 max-h-64 overflow-auto text-xs text-zinc-300">
+                                    @foreach ($forecasts as $run)
+                                        <div wire:key="forecast-run-summary-{{ $run->id }}" class="border-b border-white/5 py-2">
+                                            <div class="flex items-center justify-between gap-3">
+                                                <span class="font-semibold text-white">{{ $run->source }}</span>
+                                                <span class="text-zinc-500">{{ $run->completed_at?->format('H:i:s') }}</span>
+                                            </div>
+                                            <div class="mt-1 flex justify-between gap-3">
+                                                <span>{{ $run->evaluated_points }}/{{ $run->total_points }} checked</span>
+                                                <span>{{ $run->mean_absolute_percentage_error ? number_format((float) $run->mean_absolute_percentage_error, 2).'%' : 'pending' }}</span>
+                                            </div>
                                         </div>
-                                    @empty
-                                        <p>No forecast points stored.</p>
-                                    @endforelse
+                                    @endforeach
                                 </div>
                             </div>
                         @else

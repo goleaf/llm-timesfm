@@ -23,6 +23,7 @@ class ReadMarketsDashboardAction
      *     candles:Collection<int,CryptoCandle>,
      *     snapshots:Collection<int,CryptoPriceSnapshot>,
      *     forecast:?CryptoForecast,
+     *     forecasts:Collection<int,CryptoForecast>,
      *     predictionStakes:Collection<int,CryptoPredictionStake>
      * }
      */
@@ -34,13 +35,15 @@ class ReadMarketsDashboardAction
         $selectedAsset = $assets->firstWhere('symbol', $symbol)
             ?: $this->selectedAsset($symbol)
             ?: $assets->first();
+        $forecasts = $selectedAsset ? $this->latestForecasts($selectedAsset, $interval) : collect();
 
         return [
             'assets' => $assets,
             'selectedAsset' => $selectedAsset,
             'candles' => $selectedAsset ? $this->candles($selectedAsset, $interval) : collect(),
             'snapshots' => $selectedAsset ? $this->snapshots($selectedAsset) : collect(),
-            'forecast' => $selectedAsset ? $this->latestForecast($selectedAsset, $interval) : null,
+            'forecast' => $forecasts->first(),
+            'forecasts' => $forecasts,
             'predictionStakes' => $selectedAsset ? $this->predictionStakes($selectedAsset, $interval) : collect(),
         ];
     }
@@ -121,17 +124,23 @@ class ReadMarketsDashboardAction
         );
     }
 
-    private function latestForecast(CryptoAsset $asset, string $interval): ?CryptoForecast
+    /**
+     * @return Collection<int, CryptoForecast>
+     */
+    private function latestForecasts(CryptoAsset $asset, string $interval): Collection
     {
-        return $this->cache->remember(
-            "markets:forecast:{$asset->getKey()}:{$interval}",
+        return $this->cache->rememberCollection(
+            "markets:forecasts:{$asset->getKey()}:{$interval}:12",
             'latest_forecast',
             fn () => CryptoForecast::query()
                 ->forAsset($asset)
                 ->forInterval($interval)
                 ->latestCompleted()
-                ->first(),
-        );
+                ->limit(12)
+                ->get()
+                ->unique('source')
+                ->values(),
+        )->take(12)->values();
     }
 
     /**

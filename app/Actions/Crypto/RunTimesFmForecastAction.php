@@ -191,6 +191,10 @@ class RunTimesFmForecastAction
             throw new RuntimeException('TimesFM process returned an invalid payload.');
         }
 
+        if (($decoded['engine'] ?? null) === 'baseline-last-value' && isset($decoded['warning'])) {
+            throw new RuntimeException('TimesFM is not available: '.$decoded['warning']);
+        }
+
         return $decoded;
     }
 

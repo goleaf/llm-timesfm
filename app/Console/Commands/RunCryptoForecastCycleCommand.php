@@ -13,7 +13,7 @@ class RunCryptoForecastCycleCommand extends Command
         {--limit=3 : Number of top active assets to forecast}
         {--fresh-minutes=5 : Skip assets with a newer completed forecast}';
 
-    protected $description = 'Run a lightweight forecast cycle for top crypto assets and store forecast points for later scoring.';
+    protected $description = 'Run configured forecast analyzers for top crypto assets and store points for later scoring.';
 
     public function handle(RunCryptoForecastCycleAction $cycle): int
     {
@@ -32,7 +32,7 @@ class RunCryptoForecastCycleCommand extends Command
             },
         );
 
-        $this->info("Stored {$summary['stored']} new {$summary['period']} forecasts.");
+        $this->info("Stored {$summary['stored']} new {$summary['period']} analysis forecasts.");
 
         return self::SUCCESS;
     }

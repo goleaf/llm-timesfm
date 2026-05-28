@@ -10,7 +10,7 @@ class RunCryptoForecastCommand extends Command
 {
     protected $signature = 'crypto:forecast {symbol=BTCUSDT} {period=1h}';
 
-    protected $description = 'Run a forecast for a crypto symbol using TimesFM when enabled.';
+    protected $description = 'Run configured forecast analyzers for a crypto symbol.';
 
     public function handle(RunConfiguredCryptoForecastAction $forecasts): int
     {
@@ -18,9 +18,9 @@ class RunCryptoForecastCommand extends Command
             $this->argument('symbol'),
             $this->argument('period'),
         );
-        $forecast = $forecasts->handle($request);
+        $stored = $forecasts->handle($request);
 
-        $this->info("Stored {$forecast->source} forecast #{$forecast->getKey()} for {$request->symbol}.");
+        $this->info("Stored {$stored->count()} analysis forecasts for {$request->symbol}.");
 
         return self::SUCCESS;
     }

@@ -1,17 +1,18 @@
 # LLM TimesFM Crypto
 
-Open public Laravel 13 and Livewire 4 dashboard for real-time crypto market history, TimesFM-compatible forecasts, manual prediction stakes, and forecast accuracy tracking.
+Open public Laravel 13 and Livewire 4 dashboard for real-time crypto market history, automatic technical analysis forecasts, TimesFM-compatible forecasts, manual prediction stakes, and forecast accuracy tracking.
 
 Public repository: `https://github.com/goleaf/llm-timesfm`
 
 ## What It Does
 
 - Reads public Binance Spot JSON data.
-- Stores market snapshots, short candle history, forecasts, and forecast accuracy locally.
+- Stores market snapshots, short candle history, automatic analysis forecasts, and forecast accuracy locally.
+- Runs trend, moving average, EMA, momentum, and TimesFM analysis when available.
 - Stores manual prediction stakes for a chosen target time and resolves them against real candle data.
 - Shows real-time Livewire screens without page reloads.
 - Shows interactive SVG charts with hover tooltips for candle, live price, forecast, and forecast-accuracy details.
-- Uses a wide Full HD dashboard layout with a pair finder, pinned rates, chart workspace, live tick feed, prediction stake panel, and forecast desk.
+- Uses a wide Full HD dashboard layout with a pair finder, pinned rates, chart workspace, visible analysis points, live tick feed, prediction stake panel, and forecast desk.
 - Runs scheduled automation for market updates, missing candle backfill, forecast creation, and forecast evaluation.
 - Keeps the project open: no login, no user accounts, no private panels.
 - Keeps public pages as full-page Livewire components. Volt and standard controllers are intentionally not used.
@@ -20,6 +21,7 @@ Public repository: `https://github.com/goleaf/llm-timesfm`
 ## Local URLs
 
 - Market dashboard: `https://llm-timesfm.test/markets`
+- Analysis scoreboard: `https://llm-timesfm.test/markets/analyses/BTCUSDT`
 - Forecast statistics: `https://llm-timesfm.test/markets/stats/BTCUSDT`
 
 ## Automation
@@ -45,20 +47,28 @@ The scheduled automation keeps the local SQLite database fresh:
 - short candle gaps are filled every minute
 - stored forecasts are evaluated every minute when real candles are available
 - manual prediction stakes are resolved once their target candle has closed
-- new short-range forecasts are created every five minutes
+- new short-range analysis forecasts are created automatically every minute for the most active markets
 - the market chart includes the latest ticker snapshot as a live point, so it can update every second between candle closes
+- the market chart displays analyzer forecast points directly on the line so the predicted points are visible before real candles arrive
 
 ## Market Dashboard
 
 - Pair Finder searches by first and second currency so active pairs are easy to locate.
 - Pinned rates can be added or removed directly from the dashboard and are remembered for the current browser session.
+- Automatic analysis engines draw their forecast points on the market graph and are scored later against real candles.
 - Prediction Stake saves a user-entered target time, target price, direction, confidence, and note for the selected market.
 - The visible interface shows market rows, live ticks, charts, pinned rates, and forecasts; raw payload blocks are not shown on the screen.
+
+## Analysis Results
+
+- The analysis scoreboard compares every stored analyzer by checked points, pending points, average error, and direction accuracy.
+- Evaluated analysis points show predicted price, actual candle close, and error percentage.
+- Analysis runs stay separated by engine so weak engines are visible instead of being mixed into one number.
 
 ## Performance
 
 - SQLite runs with WAL mode, a busy timeout, and normal sync settings for faster local reads while the scheduler writes.
-- Hot market, history, forecast, and statistics reads are cached with short real-time TTLs.
+- Hot market, history, forecast, analysis, and statistics reads are cached with short real-time TTLs.
 - Redis cache is supported when available; file cache remains the default for out-of-box Herd use.
 - Dashboard caches are warmed automatically after ticker sync for the most active configured symbols.
 - Crypto tables include composite indexes for dashboard lists, latest snapshots, candle windows, forecast runs, forecast-point evaluation, and prediction stake resolution.

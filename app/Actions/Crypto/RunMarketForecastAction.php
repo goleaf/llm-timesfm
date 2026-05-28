@@ -10,7 +10,7 @@ class RunMarketForecastAction
 {
     public function __construct(
         private readonly FillMissingCryptoCandlesAction $fillMissing,
-        private readonly RunTimesFmForecastAction $forecasts,
+        private readonly RunForecastAnalyzersAction $forecasts,
     ) {}
 
     /**
@@ -32,7 +32,7 @@ class RunMarketForecastAction
         $context = (int) $settings['context'];
         $this->fillMissing->handle([$asset->symbol], [$interval], $context);
 
-        $forecast = $this->forecasts->handle(
+        $forecasts = $this->forecasts->handle(
             $asset,
             $interval,
             (int) $settings['horizon'],
@@ -41,7 +41,7 @@ class RunMarketForecastAction
 
         return [
             'interval' => $interval,
-            'message' => "Forecast #{$forecast->getKey()} stored.",
+            'message' => "Stored {$forecasts->count()} analysis forecasts.",
         ];
     }
 }

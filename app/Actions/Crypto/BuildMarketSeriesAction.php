@@ -11,10 +11,14 @@ class BuildMarketSeriesAction
 {
     /**
      * @param  Collection<int, mixed>  $candles
-     * @return array{history:string,forecast:string,min:float,max:float,latest:?float,tooltip:array<string,mixed>}
+     * @param  Collection<int, CryptoForecast>|CryptoForecast|null  $forecasts
+     * @return array{history:string,forecast:string,forecast_series:array<int,array<string,mixed>>,min:float,max:float,latest:?float,tooltip:array<string,mixed>}
      */
-    public function handle(Collection $candles, ?CryptoForecast $forecast = null, ?CryptoPriceSnapshot $latestSnapshot = null): array
+    public function handle(Collection $candles, Collection|CryptoForecast|null $forecasts = null, ?CryptoPriceSnapshot $latestSnapshot = null): array
     {
+        $forecastRuns = $forecasts instanceof CryptoForecast
+            ? collect([$forecasts])
+            : ($forecasts ?? collect());
         $historySource = $candles
             ->map(fn ($candle): array => [
                 'kind' => 'candle',
@@ -60,8 +64,13 @@ class BuildMarketSeriesAction
             ->pluck('value')
             ->values();
 
-        $forecastValues = collect($forecast?->point_forecast ?? [])
-            ->map(fn (float|int|string $value): float => (float) $value)
+        $forecastValueGroups = $forecastRuns
+            ->map(fn (CryptoForecast $forecast): Collection => collect($forecast->point_forecast ?? [])
+                ->map(fn (float|int|string $value): float => (float) $value)
+                ->values())
+            ->values();
+        $forecastValues = $forecastValueGroups
+            ->flatten()
             ->values();
 
         $allValues = $historyValues->merge($forecastValues);
@@ -70,6 +79,7 @@ class BuildMarketSeriesAction
             return [
                 'history' => '',
                 'forecast' => '',
+                'forecast_series' => [],
                 'min' => 0.0,
                 'max' => 0.0,
                 'latest' => null,
@@ -85,7 +95,10 @@ class BuildMarketSeriesAction
         $padding = 18;
         $usableWidth = $width - ($padding * 2);
         $usableHeight = $height - ($padding * 2);
-        $totalPoints = max($historyValues->count() + $forecastValues->count() - 1, 1);
+        $maxForecastPoints = (int) $forecastValueGroups
+            ->map(fn (Collection $values): int => $values->count())
+            ->max();
+        $totalPoints = max($historyValues->count() + $maxForecastPoints - 1, 1);
 
         $scale = function (float $value, int $index) use ($min, $range, $padding, $usableWidth, $usableHeight, $totalPoints): array {
             $x = $padding + (($usableWidth / $totalPoints) * $index);
@@ -114,66 +127,87 @@ class BuildMarketSeriesAction
         $historyPoints = $this->polyline($historyMeta);
 
         $forecastOffset = max($historyValues->count() - 1, 0);
-        $forecastMeta = $forecastValues
-            ->map(function (float $value, int $index) use ($forecast, $forecastOffset, $scale): array {
-                $step = $index + 1;
-                $position = $scale($value, $forecastOffset + $step);
-                $targetTime = $forecast?->input_ends_at
-                    ? CryptoIntervals::addSteps($forecast->input_ends_at, (string) $forecast->interval, $step)
-                    : null;
-                $quantiles = $forecast?->quantile_forecast[$index] ?? [];
+        $forecastSeries = $forecastRuns
+            ->values()
+            ->map(function (CryptoForecast $forecast, int $runIndex) use ($forecastOffset, $scale): array {
+                $color = $this->forecastColor($runIndex);
+                $points = collect($forecast->point_forecast ?? [])
+                    ->map(function (float|int|string $rawValue, int $index) use ($forecast, $forecastOffset, $scale, $color): array {
+                        $value = (float) $rawValue;
+                        $step = $index + 1;
+                        $position = $scale($value, $forecastOffset + $step);
+                        $targetTime = $forecast->input_ends_at
+                            ? CryptoIntervals::addSteps($forecast->input_ends_at, (string) $forecast->interval, $step)
+                            : null;
+                        $quantiles = $forecast->quantile_forecast[$index] ?? [];
+
+                        return [
+                            ...$position,
+                            'title' => ucfirst((string) $forecast->source).' analysis',
+                            'value' => $this->price($value),
+                            'time' => $targetTime?->format('Y-m-d H:i:s') ?? "Step {$step}",
+                            'color' => $color,
+                            'rows' => [
+                                ['label' => 'Type', 'value' => 'Analysis point'],
+                                ['label' => 'Analyzer', 'value' => (string) $forecast->source],
+                                ['label' => 'Step', 'value' => (string) $step],
+                                ['label' => 'Target time', 'value' => $targetTime?->format('Y-m-d H:i:s') ?? 'Pending'],
+                                ['label' => 'Predicted', 'value' => $this->price($value)],
+                                ['label' => 'Low quantile', 'value' => isset($quantiles[0]) ? $this->price($quantiles[0]) : 'n/a'],
+                                ['label' => 'Median quantile', 'value' => isset($quantiles[1]) ? $this->price($quantiles[1]) : 'n/a'],
+                                ['label' => 'High quantile', 'value' => isset($quantiles[2]) ? $this->price($quantiles[2]) : 'n/a'],
+                                ['label' => 'Forecast run', 'value' => '#'.$forecast->getKey()],
+                            ],
+                        ];
+                    })
+                    ->values();
 
                 return [
-                    ...$position,
-                    'title' => 'Forecast',
-                    'value' => $this->price($value),
-                    'time' => $targetTime?->format('Y-m-d H:i:s') ?? "Step {$step}",
-                    'rows' => [
-                        ['label' => 'Type', 'value' => 'Forecast'],
-                        ['label' => 'Step', 'value' => (string) $step],
-                        ['label' => 'Target time', 'value' => $targetTime?->format('Y-m-d H:i:s') ?? 'Pending'],
-                        ['label' => 'Predicted', 'value' => $this->price($value)],
-                        ['label' => 'Low quantile', 'value' => isset($quantiles[0]) ? $this->price($quantiles[0]) : 'n/a'],
-                        ['label' => 'Median quantile', 'value' => isset($quantiles[1]) ? $this->price($quantiles[1]) : 'n/a'],
-                        ['label' => 'High quantile', 'value' => isset($quantiles[2]) ? $this->price($quantiles[2]) : 'n/a'],
-                        ['label' => 'Forecast run', 'value' => $forecast ? '#'.$forecast->getKey() : 'n/a'],
-                    ],
+                    'label' => (string) $forecast->source,
+                    'color' => $color,
+                    'points' => $points->all(),
+                    'polyline' => $this->polyline($points),
                 ];
             })
-            ->values();
-        $forecastPoints = $this->polyline($forecastMeta);
+            ->filter(fn (array $series): bool => $series['polyline'] !== '')
+            ->values()
+            ->all();
+        $forecastPoints = $forecastSeries[0]['polyline'] ?? '';
 
         return [
             'history' => $historyPoints,
             'forecast' => $forecastPoints,
+            'forecast_series' => $forecastSeries,
             'min' => $min,
             'max' => $max,
             'latest' => $historyValues->last(),
-            'tooltip' => $this->payload($historyMeta->all(), $forecastMeta->all()),
+            'tooltip' => $this->payload($historyMeta->all(), $forecastSeries),
         ];
     }
 
     /**
      * @param  array<int, array<string, mixed>>  $historyPoints
-     * @param  array<int, array<string, mixed>>  $forecastPoints
+     * @param  array<int, array<string, mixed>>  $forecastSeries
      * @return array<string, mixed>
      */
-    private function payload(array $historyPoints, array $forecastPoints): array
+    private function payload(array $historyPoints, array $forecastSeries): array
     {
         return [
-            'point_count' => count($historyPoints) + count($forecastPoints),
-            'series' => [
+            'point_count' => count($historyPoints) + collect($forecastSeries)->sum(fn (array $series): int => count($series['points'])),
+            'series' => collect([
                 [
                     'label' => 'Market',
                     'color' => '#2dd4bf',
                     'points' => $historyPoints,
                 ],
-                [
-                    'label' => 'Forecast',
-                    'color' => '#fbbf24',
-                    'points' => $forecastPoints,
-                ],
-            ],
+            ])
+                ->merge(collect($forecastSeries)->map(fn (array $series): array => [
+                    'label' => $series['label'],
+                    'color' => $series['color'],
+                    'points' => $series['points'],
+                ]))
+                ->values()
+                ->all(),
         ];
     }
 
@@ -206,5 +240,17 @@ class BuildMarketSeriesAction
     private function percent(float|int|string|null $value): string
     {
         return $value === null ? 'n/a' : number_format((float) $value, 2).'%';
+    }
+
+    private function forecastColor(int $index): string
+    {
+        return [
+            '#fbbf24',
+            '#a78bfa',
+            '#fb7185',
+            '#34d399',
+            '#60a5fa',
+            '#f97316',
+        ][$index % 6];
     }
 }

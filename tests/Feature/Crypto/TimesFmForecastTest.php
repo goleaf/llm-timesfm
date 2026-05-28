@@ -46,3 +46,31 @@ it('stores a forecast returned by the TimesFM bridge process', function (): void
         ->and($forecast->total_points)->toBe(3)
         ->and(CryptoForecastPoint::query()->where('crypto_forecast_id', $forecast->getKey())->count())->toBe(3);
 });
+
+it('does not accept the TimesFM bridge fallback as a real TimesFM analysis', function (): void {
+    config()->set('crypto.forecasting.timesfm.enabled', true);
+
+    $asset = CryptoAsset::factory()
+        ->hasCandles(12, [
+            'interval' => '1m',
+            'close_price' => '100.000000000000',
+        ])
+        ->create([
+            'symbol' => 'BTCUSDT',
+            'base_asset' => 'BTC',
+            'quote_asset' => 'USDT',
+        ]);
+
+    Process::fake([
+        '*' => Process::result(
+            output: json_encode([
+                'engine' => 'baseline-last-value',
+                'warning' => 'No module named timesfm',
+                'point_forecast' => [100.0, 100.0, 100.0],
+            ], JSON_THROW_ON_ERROR),
+        ),
+    ]);
+
+    expect(fn (): CryptoForecast => app(RunTimesFmForecastAction::class)->handle($asset, '1m', 3, 12))
+        ->toThrow(RuntimeException::class, 'TimesFM is not available');
+});

@@ -5,14 +5,18 @@ namespace App\Actions\Crypto;
 use App\Http\Requests\Crypto\RunCryptoForecastRequest;
 use App\Models\CryptoAsset;
 use App\Models\CryptoForecast;
+use Illuminate\Support\Collection;
 
 class RunConfiguredCryptoForecastAction
 {
     public function __construct(
-        private readonly RunTimesFmForecastAction $forecasts,
+        private readonly RunForecastAnalyzersAction $forecasts,
     ) {}
 
-    public function handle(RunCryptoForecastRequest $request): CryptoForecast
+    /**
+     * @return Collection<int, CryptoForecast>
+     */
+    public function handle(RunCryptoForecastRequest $request): Collection
     {
         $settings = $request->settings();
         $asset = CryptoAsset::query()

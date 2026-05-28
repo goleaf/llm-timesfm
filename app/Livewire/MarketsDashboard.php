@@ -238,8 +238,9 @@ class MarketsDashboard extends Component
             'candles' => $dashboard['candles'],
             'snapshots' => $dashboard['snapshots'],
             'forecast' => $dashboard['forecast'],
+            'forecasts' => $dashboard['forecasts'],
             'predictionStakes' => $dashboard['predictionStakes'],
-            'chart' => $chartBuilder->handle($dashboard['candles'], $dashboard['forecast'], $selectedAsset?->latestSnapshot),
+            'chart' => $chartBuilder->handle($dashboard['candles'], $dashboard['forecasts'], $selectedAsset?->latestSnapshot),
         ]);
     }
 

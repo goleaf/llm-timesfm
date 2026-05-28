@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\AnalysisResultsDashboard;
 use App\Livewire\ForecastStatsDashboard;
 use App\Livewire\MarketsDashboard;
 use App\Models\CryptoAsset;
@@ -168,4 +169,70 @@ it('renders realtime forecast statistics from evaluated forecast points', functi
         ->assertSet('selectedSymbol', 'BTCUSDT')
         ->assertSee('MAPE')
         ->assertSee('100.00%');
+});
+
+it('renders all automatic analysis results by engine', function (): void {
+    $asset = CryptoAsset::factory()
+        ->hasSnapshots(1, [
+            'price' => '71000.500000000000',
+        ])
+        ->create([
+            'symbol' => 'BTCUSDT',
+            'base_asset' => 'BTC',
+            'quote_asset' => 'USDT',
+            'rank' => 1,
+        ]);
+    $targetOpenTime = CarbonImmutable::parse('2026-05-28 12:00:00 UTC');
+    $forecast = CryptoForecast::query()->create([
+        'crypto_asset_id' => $asset->getKey(),
+        'source' => 'trend',
+        'interval' => '1m',
+        'context_points' => 120,
+        'horizon' => 1,
+        'status' => 'completed',
+        'started_at' => now()->subSeconds(5),
+        'completed_at' => now()->subSeconds(2),
+        'input_starts_at' => $targetOpenTime->subMinutes(120),
+        'input_ends_at' => $targetOpenTime->subMinute(),
+        'target_starts_at' => $targetOpenTime,
+        'target_ends_at' => $targetOpenTime,
+        'base_price' => '100.000000000000',
+        'total_points' => 1,
+        'evaluated_points' => 1,
+        'mean_absolute_error' => '2.000000000000',
+        'mean_absolute_percentage_error' => '1.851851850000',
+        'direction_accuracy' => '100.0000',
+        'evaluated_at' => now(),
+        'point_forecast' => [110.0],
+        'config' => ['engine' => 'trend'],
+    ]);
+
+    CryptoForecastPoint::query()->create([
+        'crypto_forecast_id' => $forecast->getKey(),
+        'crypto_asset_id' => $asset->getKey(),
+        'source' => 'trend',
+        'interval' => '1m',
+        'step' => 1,
+        'target_open_time' => $targetOpenTime,
+        'base_price' => '100.000000000000',
+        'predicted_price' => '110.000000000000',
+        'actual_close_price' => '108.000000000000',
+        'absolute_error' => '2.000000000000',
+        'absolute_percentage_error' => '1.851851850000',
+        'direction_correct' => true,
+        'evaluated_at' => now(),
+    ]);
+
+    get('/markets/analyses/BTCUSDT')
+        ->assertOk()
+        ->assertSee('Analysis Scoreboard')
+        ->assertSee('trend')
+        ->assertSee('Compared Points')
+        ->assertSee('Analysis Runs')
+        ->assertSee('100.00%');
+
+    Livewire::test(AnalysisResultsDashboard::class, ['symbol' => 'BTCUSDT'])
+        ->assertSet('selectedSymbol', 'BTCUSDT')
+        ->assertSee('Analysis Scoreboard')
+        ->assertSee('trend');
 });

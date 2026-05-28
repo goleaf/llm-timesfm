@@ -45,19 +45,23 @@ Write for a project owner, not for a compiler.
 ## Current Public Screens
 
 - Market dashboard: `https://llm-timesfm.test/markets`
+- Analysis scoreboard: `https://llm-timesfm.test/markets/analyses/BTCUSDT`
 - Forecast statistics: `https://llm-timesfm.test/markets/stats/BTCUSDT`
 
-Both screens use interactive SVG charts. Hovering a chart shows the nearest stored point, guide line, marker, timestamp, values, volumes, forecast data, or error statistics depending on the chart.
+Public analysis screens use interactive SVG charts where needed. Hovering a chart shows the nearest stored point, guide line, marker, timestamp, values, volumes, forecast data, or error statistics depending on the chart.
 
-The market dashboard is designed for Full HD use: a wide shell, pair finder, pinned rates, main chart workspace, live tick feed, prediction stake panel, and forecast desk. Avoid returning it to a narrow centered dashboard or visible raw payload panel.
+The market dashboard is designed for Full HD use: a wide shell, pair finder, pinned rates, main chart workspace with visible analyzer forecast points, live tick feed, prediction stake panel, and forecast desk. Avoid returning it to a narrow centered dashboard or visible raw payload panel.
 
 Prediction stakes are manual, public, non-authenticated records. Keep their form validation in request objects, creation and evaluation in actions, and resolution based on stored candle data rather than browser-side calculations.
+
+Automatic analysis forecasts must stay separated by engine. Store each analyzer as its own forecast run, draw its points on the market chart, and compare it later with real candle data on the analysis scoreboard.
 
 ## Current Performance Defaults
 
 - SQLite uses WAL mode, a busy timeout, and normal sync for local read/write concurrency.
 - Cache defaults to file storage for Herd, with Redis available through the configured cache store.
 - The scheduler warms the hottest dashboard cache entries after ticker updates.
+- The scheduler runs configured automatic analyzers every minute and evaluates forecast points every minute.
 - `php artisan crypto:warm-dashboard-cache --limit=3` can be run manually after large imports.
 - New query patterns should get a matching Eloquent scope, short cache TTL, and migration-backed composite index.
 - Prediction stake reads use the same short dashboard cache pattern and must stay indexed by selected market, interval, status, and target time.

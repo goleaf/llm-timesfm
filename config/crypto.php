@@ -19,6 +19,10 @@ return [
     ],
 
     'forecasting' => [
+        'analyzers' => array_values(array_filter(array_map(
+            'trim',
+            explode(',', env('CRYPTO_FORECAST_ANALYZERS', 'trend,moving-average,ema,momentum')),
+        ))),
         'periods' => [
             '15m' => ['interval' => '1m', 'horizon' => 15, 'context' => 120],
             '1h' => ['interval' => '1m', 'horizon' => 60, 'context' => 240],

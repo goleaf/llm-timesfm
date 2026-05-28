@@ -4,14 +4,13 @@ namespace App\Actions\Crypto;
 
 use App\Http\Requests\Crypto\RunCryptoForecastCycleRequest;
 use App\Models\CryptoAsset;
-use App\Models\CryptoForecast;
 use Throwable;
 
 class RunCryptoForecastCycleAction
 {
     public function __construct(
         private readonly FillMissingCryptoCandlesAction $fillMissing,
-        private readonly RunTimesFmForecastAction $forecasts,
+        private readonly RunForecastAnalyzersAction $forecasts,
     ) {}
 
     /**
@@ -28,18 +27,6 @@ class RunCryptoForecastCycleAction
         $storedCount = 0;
 
         foreach ($assets as $asset) {
-            $latest = CryptoForecast::query()
-                ->forAsset($asset)
-                ->forInterval($settings['interval'])
-                ->completed()
-                ->where('completed_at', '>=', now()->subMinutes($request->freshMinutes))
-                ->orderByDesc('completed_at')
-                ->first();
-
-            if ($latest) {
-                continue;
-            }
-
             try {
                 $this->fillMissing->handle(
                     [$asset->symbol],
@@ -47,15 +34,18 @@ class RunCryptoForecastCycleAction
                     $settings['context'],
                 );
 
-                $forecast = $this->forecasts->handle(
+                $forecasts = $this->forecasts->handle(
                     $asset,
                     $settings['interval'],
                     $settings['horizon'],
                     $settings['context'],
+                    $request->freshMinutes,
                 );
 
-                $stored("Stored forecast #{$forecast->getKey()} for {$asset->symbol}.");
-                $storedCount++;
+                if ($forecasts->isNotEmpty()) {
+                    $stored("Stored {$forecasts->count()} analysis forecasts for {$asset->symbol}.");
+                    $storedCount += $forecasts->count();
+                }
             } catch (Throwable $exception) {
                 $warning("{$asset->symbol}: {$exception->getMessage()}");
             }

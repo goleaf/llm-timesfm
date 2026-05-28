@@ -24,6 +24,10 @@ Schedule::command('crypto:evaluate-forecasts')
     ->everyMinute()
     ->withoutOverlapping();
 
-Schedule::command('crypto:forecast-cycle 15m --limit=3 --fresh-minutes=5')
-    ->everyFiveMinutes()
+Schedule::command('crypto:evaluate-prediction-stakes')
+    ->everyMinute()
+    ->withoutOverlapping();
+
+Schedule::command('crypto:forecast-cycle 15m --limit=5 --fresh-minutes=2')
+    ->everyMinute()
     ->withoutOverlapping();
