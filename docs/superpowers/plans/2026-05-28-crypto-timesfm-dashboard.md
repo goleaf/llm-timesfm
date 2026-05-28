@@ -82,3 +82,10 @@
 - [x] Include candle, live ticker, forecast, actual, and error details in chart payloads.
 - [x] Append the latest ticker snapshot to the market chart so it updates every second between candle closes.
 - [x] Preserve hover feedback after Livewire polling morphs the DOM.
+
+### Task 11: Full HD Market Workspace
+
+- [x] Widen the market and statistics dashboards for Full HD monitors.
+- [x] Split the market dashboard into market list, chart workspace, and JSON inspector columns.
+- [x] Replace the narrow raw JSON history block with structured snapshot sections.
+- [x] Keep raw fields and raw JSON available for inspection without making them the primary view.

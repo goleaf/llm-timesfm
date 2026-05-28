@@ -42,6 +42,10 @@ it('renders the realtime markets dashboard from stored market data', function ()
         ->assertOk()
         ->assertSee('Crypto Forecast')
         ->assertSee('BTC/USDT')
+        ->assertSee('max-w-[120rem]', false)
+        ->assertSee('Structured JSON History')
+        ->assertSee('Raw fields')
+        ->assertSee('Order book')
         ->assertSee('wire:poll.1000ms', false)
         ->assertSee('data-interactive-chart', false)
         ->assertSee('data-chart-payload', false)
@@ -52,7 +56,7 @@ it('renders the realtime markets dashboard from stored market data', function ()
         ->call('selectAsset', $asset->symbol)
         ->assertSet('selectedSymbol', 'BTCUSDT')
         ->assertSee('71,000.50')
-        ->assertSee('JSON History');
+        ->assertSee('Structured JSON History');
 });
 
 it('renders realtime forecast statistics from evaluated forecast points', function (): void {
@@ -117,6 +121,7 @@ it('renders realtime forecast statistics from evaluated forecast points', functi
         ->assertOk()
         ->assertSee('Prediction Statistics')
         ->assertSee('BTC/USDT')
+        ->assertSee('max-w-[120rem]', false)
         ->assertSee('data-interactive-chart', false)
         ->assertSee('data-chart-payload', false)
         ->assertSee('Predicted', false)

@@ -47,6 +47,8 @@ Write for a project owner, not for a compiler.
 
 Both screens use interactive SVG charts. Hovering a chart shows the nearest stored point, guide line, marker, timestamp, values, volumes, forecast data, or error statistics depending on the chart.
 
+The market dashboard is designed for Full HD use: a wide shell, separate market list, main chart workspace, and structured JSON inspector column. Avoid returning it to a narrow centered dashboard.
+
 ## Current Performance Defaults
 
 - SQLite uses WAL mode, a busy timeout, and normal sync for local read/write concurrency.

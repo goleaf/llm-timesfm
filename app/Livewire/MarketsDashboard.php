@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Actions\Crypto\BuildMarketSeriesAction;
+use App\Actions\Crypto\BuildSnapshotHistoryRowsAction;
 use App\Actions\Crypto\FillMissingCryptoCandlesAction;
 use App\Actions\Crypto\ReadMarketsDashboardAction;
 use App\Actions\Crypto\RunTimesFmForecastAction;
@@ -133,8 +134,11 @@ class MarketsDashboard extends Component
         }
     }
 
-    public function render(BuildMarketSeriesAction $chartBuilder, ReadMarketsDashboardAction $reader): View
-    {
+    public function render(
+        BuildMarketSeriesAction $chartBuilder,
+        BuildSnapshotHistoryRowsAction $snapshotRows,
+        ReadMarketsDashboardAction $reader,
+    ): View {
         $dashboard = $reader->handle($this->selectedSymbol, $this->interval);
         $selectedAsset = $dashboard['selectedAsset'];
 
@@ -147,6 +151,7 @@ class MarketsDashboard extends Component
             'selectedAsset' => $selectedAsset,
             'candles' => $dashboard['candles'],
             'snapshots' => $dashboard['snapshots'],
+            'snapshotRows' => $snapshotRows->handle($dashboard['snapshots']),
             'forecast' => $dashboard['forecast'],
             'chart' => $chartBuilder->handle($dashboard['candles'], $dashboard['forecast'], $selectedAsset?->latestSnapshot),
         ]);
