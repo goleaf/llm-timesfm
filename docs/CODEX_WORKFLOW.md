@@ -50,7 +50,7 @@ Write for a project owner, not for a compiler.
 
 Public analysis screens use interactive SVG charts where needed. Hovering a chart shows the nearest stored point, guide line, marker, timestamp, values, volumes, forecast data, or error statistics depending on the chart.
 
-The market dashboard is designed for Full HD use: a wide shell, pair finder, pinned rates, main chart workspace with visible analyzer forecast points, live tick feed, prediction stake panel, and forecast desk. Avoid returning it to a narrow centered dashboard or visible raw payload panel.
+The market dashboard is designed for Full HD use: a wide shell, pair finder, source-driven first-currency list with pin controls, pinned rates, main chart workspace with visible analyzer forecast points, live tick feed, prediction stake panel, and forecast desk. Avoid returning it to a narrow centered dashboard or visible raw payload panel.
 
 Prediction stakes are manual, public, non-authenticated records. Keep their form validation in request objects, creation and evaluation in actions, and resolution based on stored candle data rather than browser-side calculations.
 

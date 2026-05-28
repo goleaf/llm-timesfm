@@ -12,7 +12,7 @@ Public repository: `https://github.com/goleaf/llm-timesfm`
 - Stores manual prediction stakes for a chosen target time and resolves them against real candle data.
 - Shows real-time Livewire screens without page reloads.
 - Shows interactive SVG charts with hover tooltips for candle, live price, forecast, and forecast-accuracy details.
-- Uses a wide Full HD dashboard layout with a pair finder, pinned rates, chart workspace, visible analysis points, live tick feed, prediction stake panel, and forecast desk.
+- Uses a wide Full HD dashboard layout with a source-driven first-currency list, pair finder, pinned rates, chart workspace, visible analysis points, live tick feed, prediction stake panel, and forecast desk.
 - Runs scheduled automation for market updates, missing candle backfill, forecast creation, and forecast evaluation.
 - Keeps the project open: no login, no user accounts, no private panels.
 - Keeps public pages as full-page Livewire components. Volt and standard controllers are intentionally not used.
@@ -53,7 +53,7 @@ The scheduled automation keeps the local SQLite database fresh:
 
 ## Market Dashboard
 
-- Pair Finder searches by first and second currency so active pairs are easy to locate.
+- Pair Finder searches by first and second currency, and the First currency field shows a live list from stored source data with direct pin controls for the best matching pair.
 - Pinned rates can be added or removed directly from the dashboard and are remembered for the current browser session.
 - Automatic analysis engines draw their forecast points on the market graph and are scored later against real candles.
 - Prediction Stake saves a user-entered target time, target price, direction, confidence, and note for the selected market.

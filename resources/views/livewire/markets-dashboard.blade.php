@@ -42,34 +42,75 @@
                         </button>
                     </div>
 
-                    <div class="mt-3 grid grid-cols-2 gap-2">
-                        <label class="block">
-                            <span class="text-xs text-zinc-500">First currency</span>
-                            <input
-                                type="search"
-                                wire:model.live.debounce.250ms="baseSearch"
-                                class="mt-1 h-10 w-full rounded-md border border-white/10 bg-black/30 px-3 text-sm font-semibold text-white outline-none focus:border-cyan-300"
-                                placeholder="BTC"
-                            >
-                        </label>
-                        <label class="block">
-                            <span class="text-xs text-zinc-500">Second currency</span>
-                            <input
-                                type="search"
-                                wire:model.live.debounce.250ms="quoteSearch"
-                                class="mt-1 h-10 w-full rounded-md border border-white/10 bg-black/30 px-3 text-sm font-semibold text-white outline-none focus:border-cyan-300"
-                                placeholder="USDT"
-                            >
-                        </label>
+                    <div class="mt-3 grid gap-3">
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="block">
+                                <span class="text-xs text-zinc-500">First currency</span>
+                                <input
+                                    type="search"
+                                    wire:model.live.debounce.250ms="baseSearch"
+                                    class="mt-1 h-10 w-full rounded-md border border-white/10 bg-black/30 px-3 text-sm font-semibold text-white outline-none focus:border-cyan-300"
+                                    placeholder="BTC"
+                                    list="base-currency-options"
+                                >
+                                <datalist id="base-currency-options">
+                                    @foreach ($board['base_options'] as $option)
+                                        <option value="{{ $option['asset'] }}">{{ $option['pin_pair'] }}</option>
+                                    @endforeach
+                                </datalist>
+                            </label>
+                            <label class="block">
+                                <span class="text-xs text-zinc-500">Second currency</span>
+                                <input
+                                    type="search"
+                                    wire:model.live.debounce.250ms="quoteSearch"
+                                    class="mt-1 h-10 w-full rounded-md border border-white/10 bg-black/30 px-3 text-sm font-semibold text-white outline-none focus:border-cyan-300"
+                                    placeholder="USDT"
+                                >
+                            </label>
+                        </div>
+
+                        <div class="overflow-hidden rounded-md border border-white/10 bg-black/20">
+                            <div class="flex items-center justify-between border-b border-white/5 px-3 py-2">
+                                <span class="text-xs font-semibold uppercase text-zinc-400">First currency list</span>
+                                <span class="text-xs text-zinc-500">{{ $board['base_options']->count() }} shown</span>
+                            </div>
+
+                            <div class="max-h-56 overflow-auto">
+                                @forelse ($board['base_options'] as $option)
+                                    <div wire:key="base-option-{{ $option['asset'] }}" class="grid grid-cols-[minmax(0,1fr)_3.5rem] gap-2 border-b border-white/5 px-3 py-2 {{ $option['is_selected'] ? 'bg-cyan-300/10' : '' }}">
+                                        <button type="button" wire:click="setBaseSearch('{{ $option['asset'] }}')" class="min-w-0 text-left">
+                                            <span class="flex items-center gap-2">
+                                                <span class="text-sm font-semibold text-white">{{ $option['asset'] }}</span>
+                                                @if ($option['is_pinned'])
+                                                    <span class="rounded bg-amber-300/15 px-1.5 py-0.5 text-[0.65rem] font-semibold text-amber-100">PIN</span>
+                                                @endif
+                                            </span>
+                                            <span class="mt-1 grid grid-cols-[minmax(0,1fr)_4.5rem] gap-2 text-xs">
+                                                <span class="truncate text-zinc-500">{{ $option['market_count'] }} · {{ $option['quote_assets'] }} · {{ $option['pin_pair'] }}</span>
+                                                <span class="text-right font-semibold {{ $option['change_positive'] ? 'text-emerald-300' : 'text-rose-300' }}">{{ $option['change'] }}</span>
+                                            </span>
+                                            <span class="mt-1 block truncate text-xs font-semibold text-zinc-300">{{ $option['price'] }}</span>
+                                        </button>
+
+                                        @if ($option['is_pinned'])
+                                            <button type="button" wire:click="unpinAsset('{{ $option['pin_symbol'] }}')" class="h-8 self-center rounded-md border border-amber-300/30 bg-amber-300/10 text-xs font-semibold text-amber-100 hover:bg-amber-300/20">
+                                                Drop
+                                            </button>
+                                        @else
+                                            <button type="button" wire:click="pinAsset('{{ $option['pin_symbol'] }}')" class="h-8 self-center rounded-md border border-white/10 bg-white/[0.04] text-xs font-semibold text-zinc-300 hover:bg-white/[0.08]">
+                                                Pin
+                                            </button>
+                                        @endif
+                                    </div>
+                                @empty
+                                    <div class="px-3 py-6 text-sm text-zinc-500">No first currencies.</div>
+                                @endforelse
+                            </div>
+                        </div>
                     </div>
 
                     <div class="mt-3 flex flex-wrap gap-1.5">
-                        @foreach ($board['base_suggestions'] as $baseAsset)
-                            <button type="button" wire:key="base-chip-{{ $baseAsset }}" wire:click="setBaseSearch('{{ $baseAsset }}')" class="rounded-md bg-cyan-300/10 px-2 py-1 text-xs font-semibold text-cyan-100 hover:bg-cyan-300/20">
-                                {{ $baseAsset }}
-                            </button>
-                        @endforeach
-
                         @foreach ($board['quote_suggestions'] as $quoteAsset)
                             <button type="button" wire:key="quote-chip-{{ $quoteAsset }}" wire:click="setQuoteSearch('{{ $quoteAsset }}')" class="rounded-md bg-amber-300/10 px-2 py-1 text-xs font-semibold text-amber-100 hover:bg-amber-300/20">
                                 {{ $quoteAsset }}

@@ -18,7 +18,7 @@ The realtime read path is cached through short-lived Laravel cache entries. SQLi
 
 Charts are rendered as SVG from server-built point payloads. Each payload contains the visible polyline coordinates and the hover rows for every point. Browser JavaScript only reads that payload, finds the nearest point under the mouse, and shows a marker, guide line, and data tooltip. The market chart adds the latest ticker snapshot as a live point so the graph can move every second even when the candle interval has not closed yet.
 
-The market screen targets Full HD workstations. It uses a wide shell with a left pair finder, central chart workspace, live tick feed, right-side pinned rates, and forecast desk. The visible interface is market-focused and does not show raw payload blocks.
+The market screen targets Full HD workstations. It uses a wide shell with a left pair finder, source-driven first-currency list with pin controls, central chart workspace, live tick feed, right-side pinned rates, and forecast desk. The visible interface is market-focused and does not show raw payload blocks.
 
 ## Data Flow
 
@@ -31,7 +31,7 @@ The market screen targets Full HD workstations. It uses a wide shell with a left
 7. The statistics dashboard shows evaluated forecast quality with live-updating charts.
 8. Cache warming prepares the most common market and statistics reads after ticker updates.
 9. Chart hover payloads expose detailed candle, live ticker, forecast, actual, and error values without querying from Blade.
-10. The market board builder converts eager-loaded assets into pair finder rows, pinned rate rows, and selected-market summary fields before they reach the Livewire view.
+10. The market board builder converts eager-loaded assets into pair finder rows, first-currency options, pinned rate rows, and selected-market summary fields before they reach the Livewire view.
 11. Request objects validate symbols, intervals, forecast periods, limits, and watch windows before the related action is called.
 
 ## Constraints

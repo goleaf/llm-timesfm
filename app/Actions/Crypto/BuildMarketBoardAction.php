@@ -15,7 +15,7 @@ class BuildMarketBoardAction
      *     pinned:Collection<int,array<string,mixed>>,
      *     filtered:Collection<int,array<string,mixed>>,
      *     selected:?array<string,mixed>,
-     *     base_suggestions:Collection<int,string>,
+     *     base_options:Collection<int,array<string,mixed>>,
      *     quote_suggestions:Collection<int,string>
      * }
      */
@@ -48,7 +48,7 @@ class BuildMarketBoardAction
             'pinned' => $rows->where('is_pinned', true)->values(),
             'filtered' => $filtered,
             'selected' => $rows->firstWhere('is_selected', true),
-            'base_suggestions' => $this->suggestions($rows, 'base_asset', $baseSearch),
+            'base_options' => $this->baseOptions($rows, $baseSearch, $quoteSearch),
             'quote_suggestions' => $this->suggestions($rows, 'quote_asset', $quoteSearch),
         ];
     }
@@ -102,6 +102,46 @@ class BuildMarketBoardAction
         }
 
         return true;
+    }
+
+    /**
+     * @param  Collection<int, array<string, mixed>>  $rows
+     * @return Collection<int, array<string, mixed>>
+     */
+    private function baseOptions(Collection $rows, string $baseSearch, string $quoteSearch): Collection
+    {
+        return $rows
+            ->filter(fn (array $row): bool => $this->matches($row, $baseSearch, $quoteSearch))
+            ->groupBy('base_asset')
+            ->map(function (Collection $baseRows, string $baseAsset): array {
+                $topRow = $baseRows
+                    ->sortBy([
+                        fn (array $left, array $right): int => (int) $right['is_pinned'] <=> (int) $left['is_pinned'],
+                        fn (array $left, array $right): int => (int) $left['rank'] <=> (int) $right['rank'],
+                    ])
+                    ->first();
+
+                return [
+                    'asset' => $baseAsset,
+                    'market_count' => $baseRows->count(),
+                    'quote_assets' => $baseRows->pluck('quote_asset')->unique()->take(4)->implode('/'),
+                    'pin_symbol' => (string) $topRow['symbol'],
+                    'pin_pair' => (string) $topRow['display_pair'],
+                    'is_pinned' => (bool) $topRow['is_pinned'],
+                    'is_selected' => (bool) $topRow['is_selected'],
+                    'price' => (string) $topRow['price'],
+                    'change' => (string) $topRow['change'],
+                    'change_positive' => (bool) $topRow['change_positive'],
+                    'rank' => (int) $topRow['rank'],
+                ];
+            })
+            ->sortBy([
+                fn (array $left, array $right): int => (int) $right['is_selected'] <=> (int) $left['is_selected'],
+                fn (array $left, array $right): int => (int) $right['is_pinned'] <=> (int) $left['is_pinned'],
+                fn (array $left, array $right): int => (int) $left['rank'] <=> (int) $right['rank'],
+            ])
+            ->take(24)
+            ->values();
     }
 
     /**

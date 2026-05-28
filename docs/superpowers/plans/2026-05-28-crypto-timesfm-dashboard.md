@@ -100,6 +100,7 @@
 ### Task 13: Pinned Pair Dashboard
 
 - [x] Add first-currency and second-currency filters to the left pair finder.
+- [x] Show a live first-currency list from stored source data with direct pin controls for the best matching pair.
 - [x] Add browser-session pinned rates that can be added and removed from the dashboard.
 - [x] Keep pinned rates, live ticks, chart data, and forecast controls inside the same one-second Livewire update surface.
 - [x] Rebuild the market screen using a restrained technical dashboard design.

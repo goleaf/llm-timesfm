@@ -48,10 +48,27 @@ it('renders the realtime markets dashboard from stored market data', function ()
             'rank' => 1,
         ]);
 
+    CryptoAsset::factory()
+        ->hasSnapshots(1, [
+            'price' => '3800.250000000000',
+            'open_price' => '3700.000000000000',
+            'high_price' => '3900.000000000000',
+            'low_price' => '3600.000000000000',
+            'quote_volume' => '4250000.000000000000',
+            'trade_count' => 800,
+        ])
+        ->create([
+            'symbol' => 'ETHUSDT',
+            'base_asset' => 'ETH',
+            'quote_asset' => 'USDT',
+            'rank' => 2,
+        ]);
+
     get('/markets')
         ->assertOk()
         ->assertSee('Crypto Dashboard')
         ->assertSee('BTC/USDT')
+        ->assertSee('ETH/USDT')
         ->assertSee('max-w-[120rem]', false)
         ->assertSee('Pair Finder')
         ->assertSee('Pinned Rates')
@@ -59,6 +76,8 @@ it('renders the realtime markets dashboard from stored market data', function ()
         ->assertSee('Prediction Stake')
         ->assertSee('Save prediction stake')
         ->assertSee('First currency')
+        ->assertSee('First currency list')
+        ->assertSee('base-currency-options', false)
         ->assertSee('Second currency')
         ->assertSee('wire:poll.visible.1000ms', false)
         ->assertSee('data-interactive-chart', false)
@@ -72,6 +91,9 @@ it('renders the realtime markets dashboard from stored market data', function ()
     Livewire::test(MarketsDashboard::class)
         ->call('selectAsset', $asset->symbol)
         ->assertSet('selectedSymbol', 'BTCUSDT')
+        ->call('setBaseSearch', 'ETH')
+        ->assertSet('baseSearch', 'ETH')
+        ->assertSee('ETH/USDT')
         ->call('setInterval', '2h')
         ->assertSet('interval', '1m')
         ->call('setForecastPeriod', '7d')
