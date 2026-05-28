@@ -13,6 +13,8 @@
         @livewireStyles
     </head>
     <body class="min-h-screen bg-zinc-950 text-zinc-100 antialiased">
+        <livewire:language-switcher />
+
         {{ $slot }}
 
         @livewireScripts

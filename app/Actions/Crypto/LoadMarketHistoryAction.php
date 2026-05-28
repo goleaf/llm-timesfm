@@ -20,7 +20,7 @@ class LoadMarketHistoryAction
             ->first();
 
         if (! $asset) {
-            throw new RuntimeException('Market data is not loaded yet.');
+            throw new RuntimeException(__('ui.messages.market_not_loaded'));
         }
 
         $this->fillMissing->handle(
@@ -29,6 +29,6 @@ class LoadMarketHistoryAction
             (int) config('crypto.binance.history_limit'),
         );
 
-        return "History loaded for {$asset->symbol}.";
+        return __('ui.messages.history_loaded', ['symbol' => $asset->symbol]);
     }
 }

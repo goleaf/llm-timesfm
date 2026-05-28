@@ -23,6 +23,7 @@
 - [x] Keep database growth safe with composite indexes and duplicate-safe bulk imports.
 - [x] Keep route, Livewire action, and command inputs validated through request objects before workflows run.
 - [x] Keep user-interface and command classes thin by moving workflow behavior into actions.
+- [x] Keep public screens Russian-first with an RU / EN session switcher and translated interface text.
 
 ## Guard Rails
 
@@ -31,3 +32,4 @@
 - Automation must stay scheduler-driven so the project can run unattended.
 - Entry points must validate input through request objects and delegate behavior to actions.
 - Performance changes must keep data access in actions/models, never in Blade, and must include tests for cache or index behavior.
+- New public interface copy must be translated for Russian and English instead of being hardcoded into Livewire views.

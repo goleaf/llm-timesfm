@@ -25,15 +25,15 @@ class BuildMarketSeriesAction
                 'time' => $candle->open_time,
                 'value' => (float) $candle->close_price,
                 'rows' => [
-                    ['label' => 'Type', 'value' => 'Candle close'],
-                    ['label' => 'Time', 'value' => $candle->open_time->format('Y-m-d H:i:s')],
-                    ['label' => 'Open', 'value' => $this->price($candle->open_price)],
-                    ['label' => 'High', 'value' => $this->price($candle->high_price)],
-                    ['label' => 'Low', 'value' => $this->price($candle->low_price)],
-                    ['label' => 'Close', 'value' => $this->price($candle->close_price)],
-                    ['label' => 'Base volume', 'value' => $this->number($candle->base_volume)],
-                    ['label' => 'Quote volume', 'value' => $this->number($candle->quote_volume)],
-                    ['label' => 'Trades', 'value' => number_format((int) $candle->trade_count)],
+                    ['label' => __('ui.chart.type'), 'value' => __('ui.chart.candle_close')],
+                    ['label' => __('ui.chart.time'), 'value' => $candle->open_time->format('Y-m-d H:i:s')],
+                    ['label' => __('ui.chart.open'), 'value' => $this->price($candle->open_price)],
+                    ['label' => __('ui.chart.high'), 'value' => $this->price($candle->high_price)],
+                    ['label' => __('ui.chart.low'), 'value' => $this->price($candle->low_price)],
+                    ['label' => __('ui.chart.close'), 'value' => $this->price($candle->close_price)],
+                    ['label' => __('ui.chart.base_volume'), 'value' => $this->number($candle->base_volume)],
+                    ['label' => __('ui.chart.quote_volume'), 'value' => $this->number($candle->quote_volume)],
+                    ['label' => __('ui.chart.trades'), 'value' => number_format((int) $candle->trade_count)],
                 ],
             ])
             ->values();
@@ -46,16 +46,16 @@ class BuildMarketSeriesAction
                 'time' => $latestSnapshot->source_event_at,
                 'value' => (float) $latestSnapshot->price,
                 'rows' => [
-                    ['label' => 'Type', 'value' => 'Live price'],
-                    ['label' => 'Time', 'value' => $latestSnapshot->source_event_at->format('Y-m-d H:i:s')],
-                    ['label' => 'Last', 'value' => $this->price($latestSnapshot->price)],
-                    ['label' => 'Bid', 'value' => $this->price($latestSnapshot->bid_price)],
-                    ['label' => 'Ask', 'value' => $this->price($latestSnapshot->ask_price)],
-                    ['label' => '24h high', 'value' => $this->price($latestSnapshot->high_price)],
-                    ['label' => '24h low', 'value' => $this->price($latestSnapshot->low_price)],
-                    ['label' => '24h change', 'value' => $this->percent($latestSnapshot->price_change_percent)],
-                    ['label' => 'Quote volume', 'value' => $this->number($latestSnapshot->quote_volume)],
-                    ['label' => 'Trades', 'value' => number_format((int) $latestSnapshot->trade_count)],
+                    ['label' => __('ui.chart.type'), 'value' => __('ui.chart.live_price')],
+                    ['label' => __('ui.chart.time'), 'value' => $latestSnapshot->source_event_at->format('Y-m-d H:i:s')],
+                    ['label' => __('ui.chart.last'), 'value' => $this->price($latestSnapshot->price)],
+                    ['label' => __('ui.chart.bid'), 'value' => $this->price($latestSnapshot->bid_price)],
+                    ['label' => __('ui.chart.ask'), 'value' => $this->price($latestSnapshot->ask_price)],
+                    ['label' => __('ui.chart.high_24h'), 'value' => $this->price($latestSnapshot->high_price)],
+                    ['label' => __('ui.chart.low_24h'), 'value' => $this->price($latestSnapshot->low_price)],
+                    ['label' => __('ui.chart.change_24h'), 'value' => $this->percent($latestSnapshot->price_change_percent)],
+                    ['label' => __('ui.chart.quote_volume'), 'value' => $this->number($latestSnapshot->quote_volume)],
+                    ['label' => __('ui.chart.trades'), 'value' => number_format((int) $latestSnapshot->trade_count)],
                 ],
             ]);
         }
@@ -121,7 +121,7 @@ class BuildMarketSeriesAction
 
                 return [
                     ...$position,
-                    'title' => $point['kind'] === 'live' ? 'Live price' : 'Candle',
+                    'title' => $point['kind'] === 'live' ? __('ui.chart.live_price') : __('ui.chart.candle'),
                     'value' => $this->price($point['value']),
                     'time' => $point['time']->format('Y-m-d H:i:s'),
                     'rows' => $point['rows'],
@@ -148,21 +148,21 @@ class BuildMarketSeriesAction
 
                         return [
                             ...$position,
-                            'title' => ucfirst((string) $forecast->source).' analysis',
+                            'title' => __('ui.chart.analysis', ['engine' => ucfirst((string) $forecast->source)]),
                             'value' => $this->price($value),
                             'raw_value' => $value,
                             'time' => $targetTime?->format('Y-m-d H:i:s') ?? "Step {$step}",
                             'color' => $color,
                             'rows' => [
-                                ['label' => 'Type', 'value' => 'Analysis point'],
-                                ['label' => 'Analyzer', 'value' => (string) $forecast->source],
-                                ['label' => 'Step', 'value' => (string) $step],
-                                ['label' => 'Target time', 'value' => $targetTime?->format('Y-m-d H:i:s') ?? 'Pending'],
-                                ['label' => 'Predicted', 'value' => $this->price($value)],
-                                ['label' => 'Low quantile', 'value' => isset($quantiles[0]) ? $this->price($quantiles[0]) : 'n/a'],
-                                ['label' => 'Median quantile', 'value' => isset($quantiles[1]) ? $this->price($quantiles[1]) : 'n/a'],
-                                ['label' => 'High quantile', 'value' => isset($quantiles[2]) ? $this->price($quantiles[2]) : 'n/a'],
-                                ['label' => 'Forecast run', 'value' => '#'.$forecast->getKey()],
+                                ['label' => __('ui.chart.type'), 'value' => __('ui.chart.analysis_point')],
+                                ['label' => __('ui.chart.analyzer'), 'value' => (string) $forecast->source],
+                                ['label' => __('ui.chart.step'), 'value' => (string) $step],
+                                ['label' => __('ui.chart.target_time'), 'value' => $targetTime?->format('Y-m-d H:i:s') ?? __('ui.common.pending')],
+                                ['label' => __('ui.chart.predicted'), 'value' => $this->price($value)],
+                                ['label' => __('ui.chart.low_quantile'), 'value' => isset($quantiles[0]) ? $this->price($quantiles[0]) : __('ui.common.na')],
+                                ['label' => __('ui.chart.median_quantile'), 'value' => isset($quantiles[1]) ? $this->price($quantiles[1]) : __('ui.common.na')],
+                                ['label' => __('ui.chart.high_quantile'), 'value' => isset($quantiles[2]) ? $this->price($quantiles[2]) : __('ui.common.na')],
+                                ['label' => __('ui.chart.forecast_run'), 'value' => '#'.$forecast->getKey()],
                             ],
                         ];
                     })
@@ -176,21 +176,21 @@ class BuildMarketSeriesAction
                     'points' => $points->all(),
                     'polyline' => $this->polyline($points),
                     'point_count' => $points->count(),
-                    'first_value' => $firstPoint ? (string) $firstPoint['value'] : 'n/a',
-                    'last_value' => $lastPoint ? (string) $lastPoint['value'] : 'n/a',
+                    'first_value' => $firstPoint ? (string) $firstPoint['value'] : __('ui.common.na'),
+                    'last_value' => $lastPoint ? (string) $lastPoint['value'] : __('ui.common.na'),
                     'delta' => $firstPoint && $lastPoint
                         ? $this->signedDelta((float) $firstPoint['raw_value'], (float) $lastPoint['raw_value'])
-                        : 'n/a',
+                        : __('ui.common.na'),
                     'target_window' => $forecast->target_starts_at && $forecast->target_ends_at
                         ? $forecast->target_starts_at->format('H:i').' - '.$forecast->target_ends_at->format('H:i')
-                        : 'pending',
+                        : __('ui.common.pending'),
                     'compared' => (int) $forecast->evaluated_points.'/'.(int) $forecast->total_points,
                     'mape' => $forecast->mean_absolute_percentage_error
                         ? number_format((float) $forecast->mean_absolute_percentage_error, 2).'%'
-                        : 'pending',
+                        : __('ui.common.pending'),
                     'direction_accuracy' => $forecast->direction_accuracy
                         ? number_format((float) $forecast->direction_accuracy, 2).'%'
-                        : 'pending',
+                        : __('ui.common.pending'),
                 ];
             })
             ->filter(fn (array $series): bool => $series['polyline'] !== '')
@@ -225,7 +225,7 @@ class BuildMarketSeriesAction
             'point_count' => count($historyPoints) + collect($forecastSeries)->sum(fn (array $series): int => count($series['points'])),
             'series' => collect([
                 [
-                    'label' => 'Market',
+                    'label' => __('ui.chart.market'),
                     'color' => '#2dd4bf',
                     'points' => $historyPoints,
                 ],
@@ -281,34 +281,34 @@ class BuildMarketSeriesAction
 
         return [
             [
-                'label' => 'Latest',
+                'label' => __('ui.chart.latest'),
                 'value' => $this->price($latest),
-                'detail' => (string) ($latestMarker['time'] ?? 'waiting'),
+                'detail' => (string) ($latestMarker['time'] ?? __('ui.common.waiting')),
             ],
             [
-                'label' => 'Visible high',
+                'label' => __('ui.chart.visible_high'),
                 'value' => $this->price($max),
-                'detail' => 'top of range',
+                'detail' => __('ui.chart.top_of_range'),
             ],
             [
-                'label' => 'Visible low',
+                'label' => __('ui.chart.visible_low'),
                 'value' => $this->price($min),
-                'detail' => 'bottom of range',
+                'detail' => __('ui.chart.bottom_of_range'),
             ],
             [
-                'label' => 'Spread',
+                'label' => __('ui.chart.spread'),
                 'value' => $this->price($spread),
                 'detail' => number_format($spreadPercent, 2).'%',
             ],
             [
-                'label' => 'Market points',
+                'label' => __('ui.chart.market_points'),
                 'value' => number_format($marketPoints),
-                'detail' => 'candles plus live',
+                'detail' => __('ui.chart.candles_plus_live'),
             ],
             [
-                'label' => 'Analysis points',
+                'label' => __('ui.chart.analysis_points'),
                 'value' => number_format($forecastPointCount),
-                'detail' => count($forecastSeries).' engines',
+                'detail' => __('ui.chart.engines', ['count' => count($forecastSeries)]),
             ],
         ];
     }
@@ -352,7 +352,7 @@ class BuildMarketSeriesAction
     private function pointLedger(array $historyPoints, array $forecastSeries): array
     {
         $marketRows = collect($historyPoints)
-            ->map(fn (array $point): array => $this->ledgerRow('Market', '#22d3ee', $point));
+            ->map(fn (array $point): array => $this->ledgerRow(__('ui.chart.market'), '#22d3ee', $point));
 
         $analysisRows = collect($forecastSeries)
             ->flatMap(fn (array $series): Collection => collect($series['points'])
@@ -372,25 +372,25 @@ class BuildMarketSeriesAction
     {
         $rows = collect($point['rows'] ?? [])
             ->mapWithKeys(fn (array $row): array => [(string) $row['label'] => (string) $row['value']]);
-        $type = (string) $rows->get('Type', $point['title'] ?? $series);
+        $type = (string) $rows->get(__('ui.chart.type'), $point['title'] ?? $series);
 
-        if ($type === 'Analysis point') {
-            $detail = 'Step '.$rows->get('Step', 'n/a').' -> '.$rows->get('Target time', 'pending');
-            $metrics = 'Q '.$rows->get('Low quantile', 'n/a').' / '.$rows->get('Median quantile', 'n/a').' / '.$rows->get('High quantile', 'n/a');
-        } elseif ($type === 'Live price') {
-            $detail = 'Bid '.$rows->get('Bid', 'n/a').' / Ask '.$rows->get('Ask', 'n/a');
-            $metrics = '24h '.$rows->get('24h change', 'n/a').' / Vol '.$rows->get('Quote volume', 'n/a');
+        if ($type === __('ui.chart.analysis_point')) {
+            $detail = __('ui.chart.step').' '.$rows->get(__('ui.chart.step'), __('ui.common.na')).' -> '.$rows->get(__('ui.chart.target_time'), __('ui.common.pending'));
+            $metrics = 'Q '.$rows->get(__('ui.chart.low_quantile'), __('ui.common.na')).' / '.$rows->get(__('ui.chart.median_quantile'), __('ui.common.na')).' / '.$rows->get(__('ui.chart.high_quantile'), __('ui.common.na'));
+        } elseif ($type === __('ui.chart.live_price')) {
+            $detail = __('ui.chart.bid').' '.$rows->get(__('ui.chart.bid'), __('ui.common.na')).' / '.__('ui.chart.ask').' '.$rows->get(__('ui.chart.ask'), __('ui.common.na'));
+            $metrics = '24h '.$rows->get(__('ui.chart.change_24h'), __('ui.common.na')).' / '.__('ui.chart.vol').' '.$rows->get(__('ui.chart.quote_volume'), __('ui.common.na'));
         } else {
-            $detail = 'O '.$rows->get('Open', 'n/a').' / H '.$rows->get('High', 'n/a').' / L '.$rows->get('Low', 'n/a');
-            $metrics = 'Vol '.$rows->get('Quote volume', 'n/a').' / Trades '.$rows->get('Trades', 'n/a');
+            $detail = 'O '.$rows->get(__('ui.chart.open'), __('ui.common.na')).' / H '.$rows->get(__('ui.chart.high'), __('ui.common.na')).' / L '.$rows->get(__('ui.chart.low'), __('ui.common.na'));
+            $metrics = __('ui.chart.vol').' '.$rows->get(__('ui.chart.quote_volume'), __('ui.common.na')).' / '.__('ui.chart.trades').' '.$rows->get(__('ui.chart.trades'), __('ui.common.na'));
         }
 
         return [
             'series' => $series,
             'color' => $color,
             'type' => $type,
-            'time' => (string) ($point['time'] ?? 'pending'),
-            'value' => (string) ($point['value'] ?? 'n/a'),
+            'time' => (string) ($point['time'] ?? __('ui.common.pending')),
+            'value' => (string) ($point['value'] ?? __('ui.common.na')),
             'detail' => $detail,
             'metrics' => $metrics,
         ];
@@ -399,7 +399,7 @@ class BuildMarketSeriesAction
     private function price(float|int|string|null $value): string
     {
         if ($value === null) {
-            return 'n/a';
+            return __('ui.common.na');
         }
 
         $number = (float) $value;
@@ -409,12 +409,12 @@ class BuildMarketSeriesAction
 
     private function number(float|int|string|null $value): string
     {
-        return $value === null ? 'n/a' : number_format((float) $value, 2);
+        return $value === null ? __('ui.common.na') : number_format((float) $value, 2);
     }
 
     private function percent(float|int|string|null $value): string
     {
-        return $value === null ? 'n/a' : number_format((float) $value, 2).'%';
+        return $value === null ? __('ui.common.na') : number_format((float) $value, 2).'%';
     }
 
     private function signedDelta(float $first, float $last): string

@@ -30,8 +30,8 @@ class BuildForecastAccuracySeriesAction
                 'min' => 0.0,
                 'max' => 0.0,
                 'error_max' => 0.0,
-                'tooltip' => $this->payload([], [], 'Forecast accuracy'),
-                'error_tooltip' => $this->payload([], [], 'Forecast error'),
+                'tooltip' => $this->payload([], [], __('ui.chart.forecast_accuracy')),
+                'error_tooltip' => $this->payload([], [], __('ui.chart.forecast_error')),
             ];
         }
 
@@ -73,10 +73,10 @@ class BuildForecastAccuracySeriesAction
 
                 return [
                     ...$position,
-                    'title' => 'Predicted',
+                    'title' => __('ui.chart.predicted'),
                     'value' => $this->price($point->predicted_price),
                     'time' => $point->target_open_time->format('Y-m-d H:i:s'),
-                    'rows' => $this->forecastRows($point, 'Predicted', $point->predicted_price),
+                    'rows' => $this->forecastRows($point, __('ui.chart.predicted'), $point->predicted_price),
                 ];
             })
             ->values();
@@ -86,10 +86,10 @@ class BuildForecastAccuracySeriesAction
 
                 return [
                     ...$position,
-                    'title' => 'Actual',
+                    'title' => __('ui.chart.actual'),
                     'value' => $this->price($point->actual_close_price),
                     'time' => $point->target_open_time->format('Y-m-d H:i:s'),
-                    'rows' => $this->forecastRows($point, 'Actual', $point->actual_close_price),
+                    'rows' => $this->forecastRows($point, __('ui.chart.actual'), $point->actual_close_price),
                 ];
             })
             ->values();
@@ -99,18 +99,18 @@ class BuildForecastAccuracySeriesAction
 
                 return [
                     ...$position,
-                    'title' => 'Error',
+                    'title' => __('ui.common.error'),
                     'value' => $this->percent($point->absolute_percentage_error),
                     'time' => $point->target_open_time->format('Y-m-d H:i:s'),
                     'rows' => [
-                        ['label' => 'Type', 'value' => 'Forecast error'],
-                        ['label' => 'Target time', 'value' => $point->target_open_time->format('Y-m-d H:i:s')],
-                        ['label' => 'Predicted', 'value' => $this->price($point->predicted_price)],
-                        ['label' => 'Actual', 'value' => $this->price($point->actual_close_price)],
-                        ['label' => 'Absolute error', 'value' => $this->price($point->absolute_error)],
-                        ['label' => 'Percent error', 'value' => $this->percent($point->absolute_percentage_error)],
-                        ['label' => 'Direction', 'value' => $point->direction_correct ? 'Correct' : 'Wrong'],
-                        ['label' => 'Forecast run', 'value' => '#'.$point->crypto_forecast_id],
+                        ['label' => __('ui.chart.type'), 'value' => __('ui.chart.forecast_error')],
+                        ['label' => __('ui.chart.target_time'), 'value' => $point->target_open_time->format('Y-m-d H:i:s')],
+                        ['label' => __('ui.chart.predicted'), 'value' => $this->price($point->predicted_price)],
+                        ['label' => __('ui.chart.actual'), 'value' => $this->price($point->actual_close_price)],
+                        ['label' => __('ui.chart.absolute_error'), 'value' => $this->price($point->absolute_error)],
+                        ['label' => __('ui.chart.percent_error'), 'value' => $this->percent($point->absolute_percentage_error)],
+                        ['label' => __('ui.common.direction'), 'value' => $point->direction_correct ? __('ui.common.correct') : __('ui.common.wrong')],
+                        ['label' => __('ui.chart.forecast_run'), 'value' => '#'.$point->crypto_forecast_id],
                     ],
                 ];
             })
@@ -123,8 +123,8 @@ class BuildForecastAccuracySeriesAction
             'min' => $min,
             'max' => $max,
             'error_max' => (float) $errors->max(),
-            'tooltip' => $this->payload($predictedPoints->all(), $actualPoints->all(), 'Forecast accuracy'),
-            'error_tooltip' => $this->payload($errorPoints->all(), [], 'Forecast error'),
+            'tooltip' => $this->payload($predictedPoints->all(), $actualPoints->all(), __('ui.chart.forecast_accuracy')),
+            'error_tooltip' => $this->payload($errorPoints->all(), [], __('ui.chart.forecast_error')),
         ];
     }
 
@@ -140,12 +140,12 @@ class BuildForecastAccuracySeriesAction
             'point_count' => count($primaryPoints) + count($secondaryPoints),
             'series' => [
                 [
-                    'label' => $title === 'Forecast error' ? 'Error' : 'Predicted',
-                    'color' => $title === 'Forecast error' ? '#fb7185' : '#fbbf24',
+                    'label' => $title === __('ui.chart.forecast_error') ? __('ui.common.error') : __('ui.chart.predicted'),
+                    'color' => $title === __('ui.chart.forecast_error') ? '#fb7185' : '#fbbf24',
                     'points' => $primaryPoints,
                 ],
                 [
-                    'label' => 'Actual',
+                    'label' => __('ui.chart.actual'),
                     'color' => '#22d3ee',
                     'points' => $secondaryPoints,
                 ],
@@ -169,21 +169,21 @@ class BuildForecastAccuracySeriesAction
     private function forecastRows(mixed $point, string $type, float|int|string|null $value): array
     {
         return [
-            ['label' => 'Type', 'value' => $type],
-            ['label' => 'Target time', 'value' => $point->target_open_time->format('Y-m-d H:i:s')],
-            ['label' => 'Value', 'value' => $this->price($value)],
-            ['label' => 'Predicted', 'value' => $this->price($point->predicted_price)],
-            ['label' => 'Actual', 'value' => $this->price($point->actual_close_price)],
-            ['label' => 'Percent error', 'value' => $this->percent($point->absolute_percentage_error)],
-            ['label' => 'Direction', 'value' => $point->direction_correct ? 'Correct' : 'Wrong'],
-            ['label' => 'Forecast run', 'value' => '#'.$point->crypto_forecast_id],
+            ['label' => __('ui.chart.type'), 'value' => $type],
+            ['label' => __('ui.chart.target_time'), 'value' => $point->target_open_time->format('Y-m-d H:i:s')],
+            ['label' => __('ui.chart.value'), 'value' => $this->price($value)],
+            ['label' => __('ui.chart.predicted'), 'value' => $this->price($point->predicted_price)],
+            ['label' => __('ui.chart.actual'), 'value' => $this->price($point->actual_close_price)],
+            ['label' => __('ui.chart.percent_error'), 'value' => $this->percent($point->absolute_percentage_error)],
+            ['label' => __('ui.common.direction'), 'value' => $point->direction_correct ? __('ui.common.correct') : __('ui.common.wrong')],
+            ['label' => __('ui.chart.forecast_run'), 'value' => '#'.$point->crypto_forecast_id],
         ];
     }
 
     private function price(float|int|string|null $value): string
     {
         if ($value === null) {
-            return 'n/a';
+            return __('ui.common.na');
         }
 
         $number = (float) $value;
@@ -193,6 +193,6 @@ class BuildForecastAccuracySeriesAction
 
     private function percent(float|int|string|null $value): string
     {
-        return $value === null ? 'n/a' : number_format((float) $value, 2).'%';
+        return $value === null ? __('ui.common.na') : number_format((float) $value, 2).'%';
     }
 }

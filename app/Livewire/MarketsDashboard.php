@@ -203,9 +203,11 @@ class MarketsDashboard extends Component
             $this->stakeTargetPrice = '';
             $this->stakeNote = '';
             $this->resetStakeTargetTime();
-            $this->notice = 'Prediction stake saved for '.$stake->target_at
-                ->setTimezone(config('app.timezone'))
-                ->format('Y-m-d H:i');
+            $this->notice = __('ui.market.prediction_stake_saved', [
+                'time' => $stake->target_at
+                    ->setTimezone(config('app.timezone'))
+                    ->format('Y-m-d H:i'),
+            ]);
         } catch (Throwable $exception) {
             $this->notice = $this->exceptionMessage($exception);
         }

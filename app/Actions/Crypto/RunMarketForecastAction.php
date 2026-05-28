@@ -25,7 +25,7 @@ class RunMarketForecastAction
             ->first();
 
         if (! $asset || ! is_array($settings)) {
-            throw new RuntimeException('Forecast is not available for this selection.');
+            throw new RuntimeException(__('ui.messages.forecast_unavailable'));
         }
 
         $interval = (string) $settings['interval'];
@@ -41,7 +41,7 @@ class RunMarketForecastAction
 
         return [
             'interval' => $interval,
-            'message' => "Stored {$forecasts->count()} analysis forecasts.",
+            'message' => __('ui.messages.stored_forecasts', ['count' => $forecasts->count()]),
         ];
     }
 }

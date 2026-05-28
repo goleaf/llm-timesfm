@@ -9,13 +9,13 @@
     <section class="mx-auto flex min-h-screen w-full max-w-[120rem] flex-col gap-5 px-4 py-5 sm:px-6 2xl:px-8">
         <header class="flex flex-col gap-4 border-b border-white/10 pb-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-                <p class="text-sm font-medium text-cyan-300">Forecast Accuracy</p>
-                <h1 class="mt-1 text-3xl font-semibold tracking-normal text-white sm:text-4xl">Prediction Statistics</h1>
+                <p class="text-sm font-medium text-cyan-300">{{ __('ui.stats.eyebrow') }}</p>
+                <h1 class="mt-1 text-3xl font-semibold tracking-normal text-white sm:text-4xl">{{ __('ui.stats.title') }}</h1>
             </div>
 
             <div class="flex flex-wrap items-center gap-2">
                 <a href="{{ route('markets.show', ['symbol' => $selectedAsset?->symbol]) }}" class="h-10 rounded-md border border-white/10 px-3 py-2 text-sm font-semibold text-zinc-200 hover:bg-white/[0.06]">
-                    Markets
+                    {{ __('ui.common.markets') }}
                 </a>
 
                 @forelse ($intervalOptions as $value => $label)
@@ -28,7 +28,7 @@
                         {{ $label }}
                     </button>
                 @empty
-                    <span class="text-sm text-zinc-500">No intervals</span>
+                    <span class="text-sm text-zinc-500">{{ __('ui.common.no_intervals') }}</span>
                 @endforelse
             </div>
         </header>
@@ -36,7 +36,7 @@
         <div class="grid gap-5 lg:grid-cols-[21rem_minmax(0,1fr)] 2xl:grid-cols-[22rem_minmax(0,1fr)]">
             <section class="overflow-hidden rounded-md border border-white/10 bg-[#111317]">
                 <div class="flex items-center justify-between border-b border-white/10 px-4 py-3">
-                    <h2 class="text-sm font-semibold uppercase text-zinc-300">Markets</h2>
+                    <h2 class="text-sm font-semibold uppercase text-zinc-300">{{ __('ui.common.markets') }}</h2>
                     <span class="text-xs text-zinc-500">{{ $assets->count() }}</span>
                 </div>
 
@@ -62,7 +62,7 @@
                             </span>
                         </button>
                     @empty
-                        <div class="px-4 py-10 text-sm text-zinc-400">No markets loaded.</div>
+                        <div class="px-4 py-10 text-sm text-zinc-400">{{ __('ui.common.no_markets_loaded') }}</div>
                     @endforelse
                 </div>
             </section>
@@ -71,29 +71,29 @@
                 <div class="rounded-md border border-white/10 bg-[#111317]">
                     <div class="flex flex-col gap-4 border-b border-white/10 px-4 py-4 xl:flex-row xl:items-center xl:justify-between">
                         <div>
-                            <h2 class="text-2xl font-semibold text-white">{{ $selectedAsset?->display_pair ?? 'Market' }}</h2>
-                            <p class="mt-1 text-sm text-zinc-400">{{ $interval }} / {{ $points->count() }} evaluated points</p>
+                            <h2 class="text-2xl font-semibold text-white">{{ $selectedAsset?->display_pair ?? __('ui.common.market') }}</h2>
+                            <p class="mt-1 text-sm text-zinc-400">{{ __('ui.stats.subtitle', ['interval' => $interval, 'count' => $points->count()]) }}</p>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3 sm:grid-cols-5">
                             <div class="rounded-md border border-white/10 bg-white/[0.04] px-3 py-2">
-                                <p class="text-xs text-zinc-400">Forecasts</p>
+                                <p class="text-xs text-zinc-400">{{ __('ui.stats.forecasts') }}</p>
                                 <p class="text-lg font-semibold text-white">{{ $metrics['forecasts'] }}</p>
                             </div>
                             <div class="rounded-md border border-white/10 bg-white/[0.04] px-3 py-2">
-                                <p class="text-xs text-zinc-400">Evaluated</p>
+                                <p class="text-xs text-zinc-400">{{ __('ui.stats.evaluated') }}</p>
                                 <p class="text-lg font-semibold text-white">{{ $metrics['evaluated_points'] }}</p>
                             </div>
                             <div class="rounded-md border border-white/10 bg-white/[0.04] px-3 py-2">
-                                <p class="text-xs text-zinc-400">Pending</p>
+                                <p class="text-xs text-zinc-400">{{ __('ui.analysis.pending') }}</p>
                                 <p class="text-lg font-semibold text-amber-200">{{ $metrics['pending_points'] }}</p>
                             </div>
                             <div class="rounded-md border border-white/10 bg-white/[0.04] px-3 py-2">
-                                <p class="text-xs text-zinc-400">MAPE</p>
+                                <p class="text-xs text-zinc-400">{{ __('ui.common.mape') }}</p>
                                 <p class="text-lg font-semibold text-cyan-200">{{ $formatPercent($metrics['mape']) }}</p>
                             </div>
                             <div class="rounded-md border border-white/10 bg-white/[0.04] px-3 py-2">
-                                <p class="text-xs text-zinc-400">Direction</p>
+                                <p class="text-xs text-zinc-400">{{ __('ui.common.direction') }}</p>
                                 <p class="text-lg font-semibold text-emerald-200">{{ $formatPercent($metrics['direction_accuracy']) }}</p>
                             </div>
                         </div>
@@ -124,8 +124,8 @@
 
                         <div data-interactive-chart class="relative h-[22rem] overflow-hidden rounded-md border border-white/10 bg-[#0b0d10] 2xl:h-[30rem]">
                             <div class="border-b border-white/10 px-3 py-2">
-                                <p class="text-sm font-semibold text-white">Error %</p>
-                                <p class="mt-1 text-xs text-zinc-400">Max {{ $formatPercent($chart['error_max']) }}</p>
+                                <p class="text-sm font-semibold text-white">{{ __('ui.stats.error_percent') }}</p>
+                                <p class="mt-1 text-xs text-zinc-400">{{ __('ui.stats.max', ['value' => $formatPercent($chart['error_max'])]) }}</p>
                             </div>
                             <svg viewBox="0 0 720 260" role="img" class="h-[18.5rem] w-full 2xl:h-[26.5rem]">
                                 <rect width="720" height="260" fill="#09090b"></rect>
@@ -148,7 +148,7 @@
                 <div class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_22rem] 2xl:grid-cols-[minmax(0,1fr)_32rem]">
                     <section class="rounded-md border border-white/10 bg-[#111317]">
                         <div class="flex items-center justify-between border-b border-white/10 px-4 py-3">
-                            <h2 class="text-sm font-semibold uppercase text-zinc-300">Recent Evaluated Points</h2>
+                            <h2 class="text-sm font-semibold uppercase text-zinc-300">{{ __('ui.stats.recent_points') }}</h2>
                             <span class="text-xs text-zinc-500">{{ $points->count() }}</span>
                         </div>
 
@@ -161,14 +161,14 @@
                                     <span class="{{ $point->direction_correct ? 'text-emerald-300' : 'text-rose-300' }}">{{ $formatPercent($point->absolute_percentage_error) }}</span>
                                 </div>
                             @empty
-                                <div class="px-4 py-10 text-sm text-zinc-400">No evaluated forecast points yet.</div>
+                                <div class="px-4 py-10 text-sm text-zinc-400">{{ __('ui.stats.no_points') }}</div>
                             @endforelse
                         </div>
                     </section>
 
                     <section class="rounded-md border border-white/10 bg-[#111317]">
                         <div class="border-b border-white/10 px-4 py-3">
-                            <h2 class="text-sm font-semibold uppercase text-zinc-300">Forecast Runs</h2>
+                            <h2 class="text-sm font-semibold uppercase text-zinc-300">{{ __('ui.stats.forecast_runs') }}</h2>
                         </div>
 
                         <div class="max-h-96 overflow-auto">
@@ -179,13 +179,13 @@
                                         <p class="text-xs text-zinc-500">{{ $forecast->completed_at?->format('H:i:s') }}</p>
                                     </div>
                                     <div class="mt-2 grid grid-cols-3 gap-2 text-xs">
-                                        <span class="rounded-md bg-white/[0.04] px-2 py-1 text-zinc-300">MAPE {{ $formatPercent($forecast->mean_absolute_percentage_error) }}</span>
-                                        <span class="rounded-md bg-white/[0.04] px-2 py-1 text-zinc-300">Dir {{ $formatPercent($forecast->direction_accuracy) }}</span>
+                                        <span class="rounded-md bg-white/[0.04] px-2 py-1 text-zinc-300">{{ __('ui.common.mape') }} {{ $formatPercent($forecast->mean_absolute_percentage_error) }}</span>
+                                        <span class="rounded-md bg-white/[0.04] px-2 py-1 text-zinc-300">{{ __('ui.common.direction') }} {{ $formatPercent($forecast->direction_accuracy) }}</span>
                                         <span class="rounded-md bg-white/[0.04] px-2 py-1 text-zinc-300">{{ $forecast->evaluated_points }}/{{ $forecast->total_points }}</span>
                                     </div>
                                 </div>
                             @empty
-                                <div class="px-4 py-10 text-sm text-zinc-400">No forecast runs stored.</div>
+                                <div class="px-4 py-10 text-sm text-zinc-400">{{ __('ui.stats.no_runs') }}</div>
                             @endforelse
                         </div>
                     </section>

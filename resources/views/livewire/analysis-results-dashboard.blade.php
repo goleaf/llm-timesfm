@@ -1,24 +1,24 @@
 @php
     $formatPrice = fn ($value) => $value === null
-        ? 'pending'
+        ? __('ui.common.pending')
         : number_format((float) $value, (float) $value >= 1 ? 2 : 8);
-    $formatPercent = fn ($value) => $value === null ? 'pending' : number_format((float) $value, 2).'%';
+    $formatPercent = fn ($value) => $value === null ? __('ui.common.pending') : number_format((float) $value, 2).'%';
 @endphp
 
 <main wire:poll.visible.1000ms="refreshResults" class="min-h-screen bg-[#0b0d10] text-zinc-100">
     <section class="mx-auto flex min-h-screen w-full max-w-[120rem] flex-col gap-5 px-4 py-5 sm:px-6 2xl:px-8">
         <header class="flex flex-col gap-4 border-b border-white/10 pb-4 xl:flex-row xl:items-end xl:justify-between">
             <div>
-                <p class="text-sm font-medium text-cyan-300">Automatic analysis results</p>
-                <h1 class="mt-1 text-3xl font-semibold tracking-normal text-white sm:text-4xl">Analysis Scoreboard</h1>
+                <p class="text-sm font-medium text-cyan-300">{{ __('ui.analysis.eyebrow') }}</p>
+                <h1 class="mt-1 text-3xl font-semibold tracking-normal text-white sm:text-4xl">{{ __('ui.analysis.title') }}</h1>
             </div>
 
             <div class="flex flex-wrap items-center gap-2">
                 <a href="{{ route('markets.show', ['symbol' => $selectedAsset?->symbol]) }}" class="h-10 rounded-md border border-white/10 px-3 py-2 text-sm font-semibold text-zinc-200 hover:bg-white/[0.06]">
-                    Markets
+                    {{ __('ui.common.markets') }}
                 </a>
                 <a href="{{ route('markets.stats', ['symbol' => $selectedAsset?->symbol]) }}" class="h-10 rounded-md border border-white/10 px-3 py-2 text-sm font-semibold text-zinc-200 hover:bg-white/[0.06]">
-                    Forecast stats
+                    {{ __('ui.analysis.stats') }}
                 </a>
 
                 @foreach ($intervalOptions as $value => $label)
@@ -37,7 +37,7 @@
         <div class="grid gap-5 lg:grid-cols-[21rem_minmax(0,1fr)] 2xl:grid-cols-[22rem_minmax(0,1fr)]">
             <aside class="overflow-hidden rounded-md border border-white/10 bg-[#111317]">
                 <div class="flex items-center justify-between border-b border-white/10 px-4 py-3">
-                    <h2 class="text-sm font-semibold uppercase text-zinc-300">Markets</h2>
+                    <h2 class="text-sm font-semibold uppercase text-zinc-300">{{ __('ui.common.markets') }}</h2>
                     <span class="text-xs text-zinc-500">{{ $assets->count() }}</span>
                 </div>
 
@@ -63,7 +63,7 @@
                             </span>
                         </button>
                     @empty
-                        <div class="px-4 py-10 text-sm text-zinc-400">No markets loaded.</div>
+                        <div class="px-4 py-10 text-sm text-zinc-400">{{ __('ui.common.no_markets_loaded') }}</div>
                     @endforelse
                 </div>
             </aside>
@@ -72,29 +72,29 @@
                 <div class="rounded-md border border-white/10 bg-[#111317]">
                     <div class="flex flex-col gap-4 border-b border-white/10 px-4 py-4 xl:flex-row xl:items-center xl:justify-between">
                         <div>
-                            <h2 class="text-2xl font-semibold text-white">{{ $selectedAsset?->display_pair ?? 'Market' }}</h2>
-                            <p class="mt-1 text-sm text-zinc-400">{{ $interval }} / every automatic analyzer compared against real candles</p>
+                            <h2 class="text-2xl font-semibold text-white">{{ $selectedAsset?->display_pair ?? __('ui.common.market') }}</h2>
+                            <p class="mt-1 text-sm text-zinc-400">{{ __('ui.analysis.subtitle', ['interval' => $interval]) }}</p>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3 sm:grid-cols-5">
                             <div class="rounded-md border border-white/10 bg-white/[0.04] px-3 py-2">
-                                <p class="text-xs text-zinc-400">Runs</p>
+                                <p class="text-xs text-zinc-400">{{ __('ui.analysis.runs') }}</p>
                                 <p class="text-lg font-semibold text-white">{{ $totals['forecasts'] }}</p>
                             </div>
                             <div class="rounded-md border border-white/10 bg-white/[0.04] px-3 py-2">
-                                <p class="text-xs text-zinc-400">Checked</p>
+                                <p class="text-xs text-zinc-400">{{ __('ui.common.checked') }}</p>
                                 <p class="text-lg font-semibold text-white">{{ $totals['evaluated'] }}</p>
                             </div>
                             <div class="rounded-md border border-white/10 bg-white/[0.04] px-3 py-2">
-                                <p class="text-xs text-zinc-400">Pending</p>
+                                <p class="text-xs text-zinc-400">{{ __('ui.analysis.pending') }}</p>
                                 <p class="text-lg font-semibold text-amber-200">{{ $totals['pending'] }}</p>
                             </div>
                             <div class="rounded-md border border-white/10 bg-white/[0.04] px-3 py-2">
-                                <p class="text-xs text-zinc-400">MAPE</p>
+                                <p class="text-xs text-zinc-400">{{ __('ui.common.mape') }}</p>
                                 <p class="text-lg font-semibold text-cyan-200">{{ $formatPercent($totals['mape']) }}</p>
                             </div>
                             <div class="rounded-md border border-white/10 bg-white/[0.04] px-3 py-2">
-                                <p class="text-xs text-zinc-400">Direction</p>
+                                <p class="text-xs text-zinc-400">{{ __('ui.common.direction') }}</p>
                                 <p class="text-lg font-semibold text-emerald-200">{{ $formatPercent($totals['direction_accuracy']) }}</p>
                             </div>
                         </div>
@@ -109,25 +109,25 @@
                                 </div>
                                 <div class="mt-3 grid grid-cols-2 gap-2 text-xs">
                                     <div>
-                                        <span class="block text-zinc-500">Checked</span>
+                                        <span class="block text-zinc-500">{{ __('ui.common.checked') }}</span>
                                         <span class="font-semibold text-zinc-100">{{ $metric['evaluated'] }}</span>
                                     </div>
                                     <div>
-                                        <span class="block text-zinc-500">Pending</span>
+                                        <span class="block text-zinc-500">{{ __('ui.analysis.pending') }}</span>
                                         <span class="font-semibold text-amber-100">{{ $metric['pending'] }}</span>
                                     </div>
                                     <div>
-                                        <span class="block text-zinc-500">MAPE</span>
+                                        <span class="block text-zinc-500">{{ __('ui.common.mape') }}</span>
                                         <span class="font-semibold text-cyan-100">{{ $formatPercent($metric['mape']) }}</span>
                                     </div>
                                     <div>
-                                        <span class="block text-zinc-500">Direction</span>
+                                        <span class="block text-zinc-500">{{ __('ui.common.direction') }}</span>
                                         <span class="font-semibold text-emerald-100">{{ $formatPercent($metric['direction_accuracy']) }}</span>
                                     </div>
                                 </div>
                             </div>
                         @empty
-                            <div class="rounded-md border border-white/10 bg-white/[0.035] p-4 text-sm text-zinc-500">No analysis results yet.</div>
+                            <div class="rounded-md border border-white/10 bg-white/[0.035] p-4 text-sm text-zinc-500">{{ __('ui.analysis.no_results') }}</div>
                         @endforelse
                     </div>
                 </div>
@@ -135,7 +135,7 @@
                 <div class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_26rem] 2xl:grid-cols-[minmax(0,1fr)_34rem]">
                     <section class="rounded-md border border-white/10 bg-[#111317]">
                         <div class="flex items-center justify-between border-b border-white/10 px-4 py-3">
-                            <h2 class="text-sm font-semibold uppercase text-zinc-300">Compared Points</h2>
+                            <h2 class="text-sm font-semibold uppercase text-zinc-300">{{ __('ui.analysis.compared_points') }}</h2>
                             <span class="text-xs text-zinc-500">{{ $evaluatedPoints->count() }}</span>
                         </div>
 
@@ -148,7 +148,7 @@
                                         <span class="mt-1 block text-xs text-amber-100">{{ $formatPrice($point->predicted_price) }}</span>
                                     </span>
                                     <span class="min-w-0">
-                                        <span class="block text-xs text-zinc-500">Actual</span>
+                                        <span class="block text-xs text-zinc-500">{{ __('ui.common.actual') }}</span>
                                         <span class="mt-1 block truncate font-semibold text-cyan-100">{{ $formatPrice($point->actual_close_price) }}</span>
                                     </span>
                                     <span class="text-right text-xs font-semibold {{ $point->direction_correct ? 'text-emerald-300' : 'text-rose-300' }}">
@@ -156,14 +156,14 @@
                                     </span>
                                 </div>
                             @empty
-                                <div class="px-4 py-10 text-sm text-zinc-400">No compared analysis points yet.</div>
+                                <div class="px-4 py-10 text-sm text-zinc-400">{{ __('ui.analysis.no_compared_points') }}</div>
                             @endforelse
                         </div>
                     </section>
 
                     <section class="rounded-md border border-white/10 bg-[#111317]">
                         <div class="flex items-center justify-between border-b border-white/10 px-4 py-3">
-                            <h2 class="text-sm font-semibold uppercase text-zinc-300">Analysis Runs</h2>
+                            <h2 class="text-sm font-semibold uppercase text-zinc-300">{{ __('ui.analysis.analysis_runs') }}</h2>
                             <span class="text-xs text-zinc-500">{{ $forecasts->count() }}</span>
                         </div>
 
@@ -175,8 +175,8 @@
                                         <p class="text-xs text-zinc-500">{{ $forecast->completed_at?->format('M d H:i') }}</p>
                                     </div>
                                     <div class="mt-2 grid grid-cols-3 gap-2 text-xs">
-                                        <span class="rounded-md bg-white/[0.04] px-2 py-1 text-zinc-300">MAPE {{ $formatPercent($forecast->mean_absolute_percentage_error) }}</span>
-                                        <span class="rounded-md bg-white/[0.04] px-2 py-1 text-zinc-300">Dir {{ $formatPercent($forecast->direction_accuracy) }}</span>
+                                        <span class="rounded-md bg-white/[0.04] px-2 py-1 text-zinc-300">{{ __('ui.common.mape') }} {{ $formatPercent($forecast->mean_absolute_percentage_error) }}</span>
+                                        <span class="rounded-md bg-white/[0.04] px-2 py-1 text-zinc-300">{{ __('ui.common.direction') }} {{ $formatPercent($forecast->direction_accuracy) }}</span>
                                         <span class="rounded-md bg-white/[0.04] px-2 py-1 text-zinc-300">{{ $forecast->evaluated_points }}/{{ $forecast->total_points }}</span>
                                     </div>
                                     <p class="mt-2 text-xs text-zinc-500">
@@ -184,7 +184,7 @@
                                     </p>
                                 </div>
                             @empty
-                                <div class="px-4 py-10 text-sm text-zinc-400">No analysis runs stored.</div>
+                                <div class="px-4 py-10 text-sm text-zinc-400">{{ __('ui.analysis.no_runs') }}</div>
                             @endforelse
                         </div>
                     </section>

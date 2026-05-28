@@ -81,7 +81,7 @@ class BuildMarketBoardAction
             'change' => $this->signedPercent($snapshot?->price_change_percent ?? $change),
             'change_positive' => (float) ($snapshot?->price_change_percent ?? $change) >= 0,
             'updated_at' => $snapshot?->source_event_at?->format('H:i:s') ?? 'waiting',
-            'updated_full' => $snapshot?->source_event_at?->toDayDateTimeString() ?? 'Waiting for live data',
+            'updated_full' => $snapshot?->source_event_at?->toDayDateTimeString() ?? __('ui.common.waiting_for_live_data'),
         ];
     }
 

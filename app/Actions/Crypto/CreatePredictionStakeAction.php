@@ -18,7 +18,7 @@ class CreatePredictionStakeAction
 
         if (! $asset) {
             throw ValidationException::withMessages([
-                'symbol' => 'The selected market is not available.',
+                'symbol' => __('ui.messages.selected_market_unavailable'),
             ]);
         }
 

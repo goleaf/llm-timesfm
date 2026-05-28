@@ -21,6 +21,7 @@ This is an open, public, fully automated Laravel project.
 - Keep real-time dashboard reads in action classes with short-lived cache and explicit invalidation.
 - Add composite indexes for new high-frequency filters or sort orders before relying on them in polling screens.
 - Prefer bulk Eloquent upserts for repeated public JSON imports.
+- Keep the public interface Russian by default with an RU / EN switcher. User-facing labels, messages, chart payload text, and dashboard copy must use translation files instead of hardcoded view text.
 - Keep every Markdown file current when project rules, setup, screens, automation, or workflow changes.
 
 ## Required End-Of-Prompt Workflow

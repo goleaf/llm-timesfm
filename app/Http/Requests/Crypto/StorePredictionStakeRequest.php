@@ -64,8 +64,8 @@ final readonly class StorePredictionStakeRequest
     public static function directionOptions(): array
     {
         return [
-            'above' => 'Above target',
-            'below' => 'Below target',
+            'above' => __('ui.direction.above'),
+            'below' => __('ui.direction.below'),
         ];
     }
 

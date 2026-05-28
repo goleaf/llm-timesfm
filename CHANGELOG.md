@@ -4,6 +4,7 @@ This file is the human-readable history of the project. It must be updated after
 
 ## 2026-05-28
 
+- Translated the public dashboard system to Russian by default and added a persistent RU / EN language switcher for switching the same Livewire screens to English.
 - Added chart zoom controls with zoom in, zoom out, reset, mouse-wheel zoom, drag panning, and Livewire-safe zoom state for the market graph.
 - Expanded the market chart so important values are visible without hovering: price scale, latest marker, analyzer endpoint labels, chart metrics, analyzer lanes, and a live point ledger now stay on screen while the hover tooltip remains available.
 - Added a live first-currency list inside the market finder so available currencies come from stored source data, show their matching pairs, and can pin the best matching rate directly from the field.

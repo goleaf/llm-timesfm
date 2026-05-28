@@ -20,6 +20,8 @@ Charts are rendered as SVG from server-built point payloads. Each payload contai
 
 The market screen targets Full HD workstations. It uses a wide shell with a left pair finder, source-driven first-currency list with pin controls, central chart workspace, live tick feed, right-side pinned rates, and forecast desk. The visible interface is market-focused and does not show raw payload blocks.
 
+The public interface is Russian-first with a persistent RU / EN language switcher. User-facing dashboard copy, action messages, chart labels, analysis text, and statistics text are translated through language files so the same Livewire screens can render in Russian or English.
+
 ## Data Flow
 
 1. The scheduler fetches configured Binance symbols from `/api/v3/ticker/24hr`.
@@ -33,6 +35,7 @@ The market screen targets Full HD workstations. It uses a wide shell with a left
 9. Chart hover payloads expose detailed candle, live ticker, forecast, actual, and error values without querying from Blade.
 10. The market board builder converts eager-loaded assets into pair finder rows, first-currency options, pinned rate rows, and selected-market summary fields before they reach the Livewire view.
 11. Request objects validate symbols, intervals, forecast periods, limits, and watch windows before the related action is called.
+12. Locale middleware applies the selected session language before Livewire renders dashboards, actions build messages, and chart payload builders create labels.
 
 ## Constraints
 
@@ -48,4 +51,5 @@ The market screen targets Full HD workstations. It uses a wide shell with a left
 - Realtime reads should use cache actions with short TTLs and explicit invalidation after market writes.
 - Growing market tables need composite indexes that match actual Eloquent filters and sort order.
 - Full HD layout should stay wide and data-dense; do not compress the dashboard back into a narrow centered column.
+- Russian remains the default public language, and every new public UI label needs both Russian and English translations.
 - Every completed prompt must update the changelog, keep Markdown current, pass checks, commit, and push.

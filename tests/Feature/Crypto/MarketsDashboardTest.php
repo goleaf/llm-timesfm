@@ -2,6 +2,7 @@
 
 use App\Livewire\AnalysisResultsDashboard;
 use App\Livewire\ForecastStatsDashboard;
+use App\Livewire\LanguageSwitcher;
 use App\Livewire\MarketsDashboard;
 use App\Models\CryptoAsset;
 use App\Models\CryptoForecast;
@@ -13,6 +14,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
 use function Pest\Laravel\get;
+use function Pest\Laravel\withSession;
 
 uses(RefreshDatabase::class);
 
@@ -66,35 +68,37 @@ it('renders the realtime markets dashboard from stored market data', function ()
 
     get('/markets')
         ->assertOk()
-        ->assertSee('Crypto Dashboard')
+        ->assertSee(__('ui.market.title'))
         ->assertSee('BTC/USDT')
         ->assertSee('ETH/USDT')
         ->assertSee('max-w-[120rem]', false)
-        ->assertSee('Pair Finder')
-        ->assertSee('Pinned Rates')
-        ->assertSee('Live Ticks')
-        ->assertSee('Prediction Stake')
-        ->assertSee('Save prediction stake')
-        ->assertSee('First currency')
-        ->assertSee('First currency list')
+        ->assertSee(__('ui.market.pair_finder'))
+        ->assertSee(__('ui.market.pinned_rates'))
+        ->assertSee(__('ui.market.live_ticks'))
+        ->assertSee(__('ui.market.prediction_stake'))
+        ->assertSee(__('ui.market.save_prediction_stake'))
+        ->assertSee(__('ui.market.first_currency'))
+        ->assertSee(__('ui.market.first_currency_list'))
         ->assertSee('base-currency-options', false)
-        ->assertSee('Second currency')
+        ->assertSee(__('ui.market.second_currency'))
+        ->assertSee('RU')
+        ->assertSee('EN')
         ->assertSee('wire:poll.visible.1000ms', false)
         ->assertSee('data-interactive-chart', false)
         ->assertSee('data-chart-key', false)
         ->assertSee('data-chart-zoom', false)
         ->assertSee('data-chart-zoom-label', false)
         ->assertSee('data-chart-payload', false)
-        ->assertSee('Chart Metrics')
-        ->assertSee('Analyzer Lanes')
-        ->assertSee('Chart Point Ledger')
-        ->assertSee('Visible high')
-        ->assertSee('Market points')
+        ->assertSee(__('ui.market.chart_metrics'))
+        ->assertSee(__('ui.market.analyzer_lanes'))
+        ->assertSee(__('ui.market.chart_point_ledger'))
+        ->assertSee(__('ui.chart.visible_high'))
+        ->assertSee(__('ui.chart.market_points'))
         ->assertDontSee('Structured JSON History')
         ->assertDontSee('Raw JSON')
         ->assertDontSee('Raw fields')
-        ->assertSee('Live price', false)
-        ->assertSee('Candle close', false);
+        ->assertSee(__('ui.chart.latest'))
+        ->assertSee(__('ui.chart.spread'));
 
     Livewire::test(MarketsDashboard::class)
         ->call('selectAsset', $asset->symbol)
@@ -118,10 +122,10 @@ it('renders the realtime markets dashboard from stored market data', function ()
         ->set('stakeConfidence', 75)
         ->set('stakeNote', 'breakout')
         ->call('placePredictionStake')
-        ->assertSee('Prediction stake saved')
-        ->assertSee('Above target')
+        ->assertSee('Ставка прогноза сохранена')
+        ->assertSee(__('ui.direction.above'))
         ->assertSee('71,000.50')
-        ->assertSee('Pinned Rates');
+        ->assertSee(__('ui.market.pinned_rates'));
 
     expect(CryptoPredictionStake::query()->count())->toBe(1);
 });
@@ -186,14 +190,15 @@ it('renders realtime forecast statistics from evaluated forecast points', functi
 
     get('/markets/stats/BTCUSDT')
         ->assertOk()
-        ->assertSee('Prediction Statistics')
+        ->assertSee(__('ui.stats.title'))
         ->assertSee('BTC/USDT')
         ->assertSee('max-w-[120rem]', false)
         ->assertSee('wire:poll.visible.1000ms', false)
         ->assertSee('data-interactive-chart', false)
         ->assertSee('data-chart-payload', false)
-        ->assertSee('Predicted', false)
-        ->assertSee('Forecast error', false);
+        ->assertSee(__('ui.stats.error_percent'))
+        ->assertSee(__('ui.stats.recent_points'))
+        ->assertSee(__('ui.stats.forecast_runs'));
 
     Livewire::test(ForecastStatsDashboard::class, ['symbol' => 'BTCUSDT'])
         ->assertSet('selectedSymbol', 'BTCUSDT')
@@ -255,14 +260,47 @@ it('renders all automatic analysis results by engine', function (): void {
 
     get('/markets/analyses/BTCUSDT')
         ->assertOk()
-        ->assertSee('Analysis Scoreboard')
+        ->assertSee(__('ui.analysis.title'))
         ->assertSee('trend')
-        ->assertSee('Compared Points')
-        ->assertSee('Analysis Runs')
+        ->assertSee(__('ui.analysis.compared_points'))
+        ->assertSee(__('ui.analysis.analysis_runs'))
         ->assertSee('100.00%');
 
     Livewire::test(AnalysisResultsDashboard::class, ['symbol' => 'BTCUSDT'])
         ->assertSet('selectedSymbol', 'BTCUSDT')
-        ->assertSee('Analysis Scoreboard')
+        ->assertSee(__('ui.analysis.title'))
         ->assertSee('trend');
+});
+
+it('can render the market dashboard in english from the locale session', function (): void {
+    CryptoAsset::factory()
+        ->hasSnapshots(1, [
+            'price' => '71000.500000000000',
+        ])
+        ->create([
+            'symbol' => 'BTCUSDT',
+            'base_asset' => 'BTC',
+            'quote_asset' => 'USDT',
+            'rank' => 1,
+        ]);
+
+    withSession(['app.locale' => 'en']);
+
+    get('/markets')
+        ->assertOk()
+        ->assertSee('Crypto Dashboard')
+        ->assertSee('Pair Finder')
+        ->assertSee('Pinned Rates')
+        ->assertSee('RU')
+        ->assertSee('EN');
+});
+
+it('stores the selected language from the livewire switcher', function (): void {
+    Livewire::test(LanguageSwitcher::class)
+        ->call('setLocale', 'en')
+        ->assertSet('currentLocale', 'en')
+        ->assertRedirect();
+
+    expect(session('app.locale'))->toBe('en')
+        ->and(app()->getLocale())->toBe('en');
 });

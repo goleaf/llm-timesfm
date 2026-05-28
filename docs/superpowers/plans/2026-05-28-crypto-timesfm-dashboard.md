@@ -106,3 +106,10 @@
 - [x] Add browser-session pinned rates that can be added and removed from the dashboard.
 - [x] Keep pinned rates, live ticks, chart data, and forecast controls inside the same one-second Livewire update surface.
 - [x] Rebuild the market screen using a restrained technical dashboard design.
+
+### Task 14: Russian And English Interface
+
+- [x] Make Russian the default public interface language.
+- [x] Add a persistent RU / EN language switcher for the public Livewire shell.
+- [x] Move dashboard, action message, chart label, analysis, and statistics copy into translation files.
+- [x] Verify the dashboard can render in Russian by default and English from the current browser session.

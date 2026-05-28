@@ -18,6 +18,7 @@ This project is built as a Livewire-only public application.
 - Keep real-time reads behind short-lived cache actions instead of rebuilding the same dashboard queries in Livewire.
 - Keep import writes batched where possible so repeated public JSON updates do not become per-row query loops.
 - Keep chart interactivity data-driven: Livewire renders chart payload JSON, and browser JavaScript only handles pointer interaction.
+- Keep public UI text translated through the RU / EN language files. Russian is the default interface language, and the session switcher must stay available on public screens.
 
 ## End Of Prompt Checklist
 
@@ -51,6 +52,8 @@ Write for a project owner, not for a compiler.
 Public analysis screens use interactive SVG charts where needed. Hovering a chart shows the nearest stored point, guide line, marker, timestamp, values, volumes, forecast data, or error statistics depending on the chart. Market charts must also keep the key chart data visible without hover: scale labels, latest marker, analyzer endpoint labels, metric panels, analyzer lanes, and a point ledger. Chart zoom must stay client-side, preserve hover behavior, and restore its viewport after Livewire morphs.
 
 The market dashboard is designed for Full HD use: a wide shell, pair finder, source-driven first-currency list with pin controls, pinned rates, main chart workspace with visible analyzer forecast points, live tick feed, prediction stake panel, and forecast desk. Avoid returning it to a narrow centered dashboard or visible raw payload panel.
+
+The public interface is Russian-first. All user-facing dashboard labels, action messages, chart payload labels, analysis pages, and statistics pages must have Russian and English strings. Do not hardcode new public copy in Livewire views or actions unless it is market data, a symbol, a technical abbreviation, or a user-entered value.
 
 Prediction stakes are manual, public, non-authenticated records. Keep their form validation in request objects, creation and evaluation in actions, and resolution based on stored candle data rather than browser-side calculations.
 
