@@ -90,7 +90,19 @@ class CryptoAsset extends Model
 
     public function scopeDashboardList(Builder $query, int $limit = 20): Builder
     {
-        return $this->ensureColumns($query)
+        return $query
+            ->select([
+                'id',
+                'symbol',
+                'base_asset',
+                'quote_asset',
+                'rank',
+                'is_active',
+                'sort_quote_volume',
+                'last_seen_at',
+                'created_at',
+                'updated_at',
+            ])
             ->active()
             ->withLatestSnapshot()
             ->orderBy('rank')
@@ -126,7 +138,6 @@ class CryptoAsset extends Model
                 'crypto_price_snapshots.trade_count',
                 'crypto_price_snapshots.first_trade_id',
                 'crypto_price_snapshots.last_trade_id',
-                'crypto_price_snapshots.raw_payload',
                 'crypto_price_snapshots.created_at',
                 'crypto_price_snapshots.updated_at',
             ]),

@@ -65,3 +65,12 @@
 - [x] Keep public screens on full-page Livewire components.
 - [x] Forbid Volt and standard public controllers.
 - [x] Keep every completed prompt documented, committed, and pushed to the public repository.
+
+### Task 9: Realtime Performance
+
+- [x] Add SQLite settings for faster local read/write concurrency.
+- [x] Add Redis-compatible short-lived dashboard caching with file cache fallback.
+- [x] Warm hot dashboard caches after ticker updates.
+- [x] Add composite indexes for realtime dashboard and forecast-evaluation query patterns.
+- [x] Use bulk upserts for repeated Binance JSON imports.
+- [x] Add tests for indexes, cache hits, cache invalidation, warming, and duplicate-safe imports.

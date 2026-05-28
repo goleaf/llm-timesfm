@@ -6,6 +6,7 @@ use App\Models\CryptoAsset;
 use App\Models\CryptoCandle;
 use App\Models\CryptoForecast;
 use App\Models\CryptoForecastPoint;
+use App\Services\Crypto\CryptoCache;
 use App\Support\CryptoIntervals;
 use Illuminate\Support\Facades\Process;
 use RuntimeException;
@@ -154,6 +155,8 @@ class RunTimesFmForecastAction
                 'updated_at',
             ],
         );
+
+        app(CryptoCache::class)->flush();
     }
 
     /**

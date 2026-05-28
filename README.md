@@ -42,6 +42,21 @@ The scheduled automation keeps the local SQLite database fresh:
 - stored forecasts are evaluated every minute when real candles are available
 - new short-range forecasts are created every five minutes
 
+## Performance
+
+- SQLite runs with WAL mode, a busy timeout, and normal sync settings for faster local reads while the scheduler writes.
+- Hot market, history, forecast, and statistics reads are cached with short real-time TTLs.
+- Redis cache is supported when available; file cache remains the default for out-of-box Herd use.
+- Dashboard caches are warmed automatically after ticker sync for the most active configured symbols.
+- Crypto tables include composite indexes for dashboard lists, latest snapshots, candle windows, forecast runs, and forecast-point evaluation.
+- Binance ticker, metadata, and candle imports use bulk upserts so repeated JSON updates do not create duplicates.
+
+Warm the hot dashboard cache manually:
+
+```bash
+php artisan crypto:warm-dashboard-cache --limit=3
+```
+
 ## Verification
 
 ```bash

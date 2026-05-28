@@ -5,6 +5,7 @@ namespace App\Actions\Crypto;
 use App\Models\CryptoCandle;
 use App\Models\CryptoForecast;
 use App\Models\CryptoForecastPoint;
+use App\Services\Crypto\CryptoCache;
 
 class EvaluateForecastAccuracyAction
 {
@@ -166,6 +167,8 @@ class EvaluateForecastAccuracyAction
                 'updated_at',
             ],
         );
+
+        app(CryptoCache::class)->flush();
 
         return [
             'points' => count($pointRows),

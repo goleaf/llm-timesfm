@@ -35,4 +35,27 @@ return [
             'max_horizon' => (int) env('TIMESFM_MAX_HORIZON', 256),
         ],
     ],
+
+    'cache' => [
+        'enabled' => (bool) env('CRYPTO_CACHE_ENABLED', true),
+        'store' => env('CRYPTO_CACHE_STORE', env('CACHE_STORE', 'file')),
+        'ttl' => [
+            'assets' => (int) env('CRYPTO_CACHE_ASSETS_SECONDS', 1),
+            'selected_asset' => (int) env('CRYPTO_CACHE_SELECTED_ASSET_SECONDS', 1),
+            'market_history' => (int) env('CRYPTO_CACHE_MARKET_HISTORY_SECONDS', 2),
+            'snapshots' => (int) env('CRYPTO_CACHE_SNAPSHOTS_SECONDS', 1),
+            'latest_forecast' => (int) env('CRYPTO_CACHE_LATEST_FORECAST_SECONDS', 3),
+            'forecast_stats' => (int) env('CRYPTO_CACHE_FORECAST_STATS_SECONDS', 2),
+        ],
+        'warm_after_ticker_sync' => (bool) env('CRYPTO_CACHE_WARM_AFTER_TICKER_SYNC', true),
+        'warm_limit' => (int) env('CRYPTO_CACHE_WARM_LIMIT', 3),
+        'warm_symbols' => array_values(array_filter(array_map(
+            'trim',
+            explode(',', env('CRYPTO_CACHE_WARM_SYMBOLS', 'BTCUSDT,ETHUSDT,SOLUSDT')),
+        ))),
+        'warm_intervals' => array_values(array_filter(array_map(
+            'trim',
+            explode(',', env('CRYPTO_CACHE_WARM_INTERVALS', '1m,5m')),
+        ))),
+    ],
 ];

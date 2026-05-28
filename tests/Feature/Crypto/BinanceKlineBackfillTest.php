@@ -54,8 +54,10 @@ it('stores kline history for a selected crypto asset', function (): void {
     ]);
 
     $stored = app(FetchBinanceKlinesAction::class)->handle($asset, '1m', 2);
+    $storedAgain = app(FetchBinanceKlinesAction::class)->handle($asset, '1m', 2);
 
-    expect($stored)->toBe(2);
+    expect($stored)->toBe(2)
+        ->and($storedAgain)->toBe(2);
     expect(CryptoCandle::query()->forAsset($asset)->forInterval('1m')->count())->toBe(2);
 
     $latest = CryptoCandle::query()

@@ -54,8 +54,12 @@ it('stores active binance ticker assets and their latest snapshots', function ()
     ]);
 
     $summary = app(FetchBinanceTickersAction::class)->handle(['BTCUSDT', 'ETHUSDT']);
+    $summaryAgain = app(FetchBinanceTickersAction::class)->handle(['BTCUSDT', 'ETHUSDT']);
 
     expect($summary)->toMatchArray([
+        'assets' => 2,
+        'snapshots' => 2,
+    ])->and($summaryAgain)->toMatchArray([
         'assets' => 2,
         'snapshots' => 2,
     ]);

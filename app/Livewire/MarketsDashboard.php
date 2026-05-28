@@ -4,11 +4,10 @@ namespace App\Livewire;
 
 use App\Actions\Crypto\BuildMarketSeriesAction;
 use App\Actions\Crypto\FillMissingCryptoCandlesAction;
+use App\Actions\Crypto\ReadMarketsDashboardAction;
 use App\Actions\Crypto\RunTimesFmForecastAction;
 use App\Models\CryptoAsset;
 use App\Models\CryptoCandle;
-use App\Models\CryptoForecast;
-use App\Models\CryptoPriceSnapshot;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Layout;
@@ -134,49 +133,22 @@ class MarketsDashboard extends Component
         }
     }
 
-    public function render(BuildMarketSeriesAction $chartBuilder): View
+    public function render(BuildMarketSeriesAction $chartBuilder, ReadMarketsDashboardAction $reader): View
     {
-        $assets = CryptoAsset::query()->dashboardList(20)->get();
-        $selectedAsset = $this->selectedAssetQuery()->first() ?: $assets->first();
+        $dashboard = $reader->handle($this->selectedSymbol, $this->interval);
+        $selectedAsset = $dashboard['selectedAsset'];
 
         if ($selectedAsset && $this->selectedSymbol !== $selectedAsset->symbol) {
             $this->selectedSymbol = $selectedAsset->symbol;
         }
 
-        $candles = $selectedAsset
-            ? CryptoCandle::query()
-                ->forAsset($selectedAsset)
-                ->forInterval($this->interval)
-                ->latestComplete()
-                ->limit(160)
-                ->get()
-                ->sortBy('open_time')
-                ->values()
-            : collect();
-
-        $snapshots = $selectedAsset
-            ? CryptoPriceSnapshot::query()
-                ->forAsset($selectedAsset)
-                ->latestEvents()
-                ->limit(20)
-                ->get()
-            : collect();
-
-        $forecast = $selectedAsset
-            ? CryptoForecast::query()
-                ->forAsset($selectedAsset)
-                ->forInterval($this->interval)
-                ->latestCompleted()
-                ->first()
-            : null;
-
         return view('livewire.markets-dashboard', [
-            'assets' => $assets,
+            'assets' => $dashboard['assets'],
             'selectedAsset' => $selectedAsset,
-            'candles' => $candles,
-            'snapshots' => $snapshots,
-            'forecast' => $forecast,
-            'chart' => $chartBuilder->handle($candles, $forecast),
+            'candles' => $dashboard['candles'],
+            'snapshots' => $dashboard['snapshots'],
+            'forecast' => $dashboard['forecast'],
+            'chart' => $chartBuilder->handle($dashboard['candles'], $dashboard['forecast']),
         ]);
     }
 

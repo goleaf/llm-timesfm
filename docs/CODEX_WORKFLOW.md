@@ -13,6 +13,8 @@ This project is built as a Livewire-only public application.
 - Keep the application open; do not add auth, accounts, roles, private panels, or password reset.
 - Keep automation in Artisan commands and Laravel Scheduler.
 - Keep all Markdown files aligned with the actual project state.
+- Keep real-time reads behind short-lived cache actions instead of rebuilding the same dashboard queries in Livewire.
+- Keep import writes batched where possible so repeated public JSON updates do not become per-row query loops.
 
 ## End Of Prompt Checklist
 
@@ -41,3 +43,11 @@ Write for a project owner, not for a compiler.
 
 - Market dashboard: `https://llm-timesfm.test/markets`
 - Forecast statistics: `https://llm-timesfm.test/markets/stats/BTCUSDT`
+
+## Current Performance Defaults
+
+- SQLite uses WAL mode, a busy timeout, and normal sync for local read/write concurrency.
+- Cache defaults to file storage for Herd, with Redis available through the configured cache store.
+- The scheduler warms the hottest dashboard cache entries after ticker updates.
+- `php artisan crypto:warm-dashboard-cache --limit=3` can be run manually after large imports.
+- New query patterns should get a matching Eloquent scope, short cache TTL, and migration-backed composite index.

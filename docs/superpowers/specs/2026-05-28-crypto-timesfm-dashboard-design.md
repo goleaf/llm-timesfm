@@ -12,6 +12,8 @@ TimesFM runs outside PHP through `python/timesfm_forecast.py`. The Laravel actio
 
 The project is public and Livewire-only. It intentionally has no authentication system, user account model, private panel, standard public controller, traditional public Blade page, or Volt component.
 
+The realtime read path is cached through short-lived Laravel cache entries. SQLite remains the local source of truth and runs with WAL-oriented settings, while Redis can be used as a faster cache store when available. Scheduler-driven ticker updates refresh market data and warm the most common dashboard reads so Livewire polling does not repeat the same database work for every viewer.
+
 ## Data Flow
 
 1. The scheduler fetches configured Binance symbols from `/api/v3/ticker/24hr`.
@@ -21,6 +23,7 @@ The project is public and Livewire-only. It intentionally has no authentication 
 5. The forecast cycle reads candles, calls the Python bridge, and stores forecast runs plus forecast points.
 6. The evaluator compares forecast points with actual candle closes when the target candles exist.
 7. The statistics dashboard shows evaluated forecast quality with live-updating charts.
+8. Cache warming prepares the most common market and statistics reads after ticker updates.
 
 ## Constraints
 
@@ -31,4 +34,6 @@ The project is public and Livewire-only. It intentionally has no authentication 
 - Binance is the first data source because it supports public market JSON and one-second update patterns.
 - TimesFM can run through the local Python environment, with baseline fallback when disabled.
 - No auth, users, private panels, Volt, public controllers, or traditional public Blade pages.
+- Realtime reads should use cache actions with short TTLs and explicit invalidation after market writes.
+- Growing market tables need composite indexes that match actual Eloquent filters and sort order.
 - Every completed prompt must update the changelog, keep Markdown current, pass checks, commit, and push.

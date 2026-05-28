@@ -4,6 +4,7 @@ This file is the human-readable history of the project. It must be updated after
 
 ## 2026-05-28
 
+- Added faster local database settings, Redis-compatible dashboard caching, automatic cache warming, bulk market-data writes, and extra performance tests so the real-time screens can keep updating smoothly as stored market history grows.
 - Refreshed the project documentation so every Markdown file now points to the public repository, describes the Livewire-only rule, explains the automated market pipeline, and records the required commit-and-push workflow.
 - Converted the project into an open public crypto forecasting dashboard with no login, registration, user accounts, password reset, or private access flow.
 - Removed the default Laravel connection systems that were not needed for this public project, including database-backed sessions, cache storage, queue jobs, mail settings, cloud storage settings, and user tables.

@@ -5,6 +5,7 @@ namespace App\Actions\Crypto;
 use App\Actions\Crypto\Concerns\ParsesBinanceTime;
 use App\Models\CryptoAsset;
 use App\Models\CryptoCandle;
+use App\Services\Crypto\CryptoCache;
 use App\Support\CryptoIntervals;
 use Carbon\CarbonInterface;
 use Illuminate\Http\Client\PendingRequest;
@@ -44,7 +45,8 @@ class FetchBinanceKlinesAction
             throw new RuntimeException('Binance kline response was not an array.');
         }
 
-        $stored = 0;
+        $rows = [];
+        $now = now();
 
         foreach ($payload as $row) {
             if (! is_array($row) || count($row) < 11) {
@@ -53,33 +55,55 @@ class FetchBinanceKlinesAction
 
             $openTime = $this->fromBinanceMilliseconds((int) $row[0]);
 
-            CryptoCandle::query()->updateOrCreate(
-                [
-                    'crypto_asset_id' => $asset->getKey(),
-                    'source' => 'binance',
-                    'interval' => $interval,
-                    'open_time' => $openTime,
-                ],
-                [
-                    'close_time' => $this->fromBinanceMilliseconds((int) $row[6]),
-                    'open_price' => (string) $row[1],
-                    'high_price' => (string) $row[2],
-                    'low_price' => (string) $row[3],
-                    'close_price' => (string) $row[4],
-                    'base_volume' => (string) $row[5],
-                    'quote_volume' => (string) $row[7],
-                    'trade_count' => (int) $row[8],
-                    'taker_buy_base_volume' => (string) ($row[9] ?? '0'),
-                    'taker_buy_quote_volume' => (string) ($row[10] ?? '0'),
-                    'ignored_value' => isset($row[11]) ? (string) $row[11] : null,
-                    'raw_payload' => $row,
-                ],
-            );
-
-            $stored++;
+            $rows[] = [
+                'crypto_asset_id' => $asset->getKey(),
+                'source' => 'binance',
+                'interval' => $interval,
+                'open_time' => $openTime,
+                'close_time' => $this->fromBinanceMilliseconds((int) $row[6]),
+                'open_price' => (string) $row[1],
+                'high_price' => (string) $row[2],
+                'low_price' => (string) $row[3],
+                'close_price' => (string) $row[4],
+                'base_volume' => (string) $row[5],
+                'quote_volume' => (string) $row[7],
+                'trade_count' => (int) $row[8],
+                'taker_buy_base_volume' => (string) ($row[9] ?? '0'),
+                'taker_buy_quote_volume' => (string) ($row[10] ?? '0'),
+                'ignored_value' => isset($row[11]) ? (string) $row[11] : null,
+                'raw_payload' => json_encode($row, JSON_THROW_ON_ERROR),
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
         }
 
-        return $stored;
+        if ($rows === []) {
+            return 0;
+        }
+
+        CryptoCandle::query()->upsert(
+            $rows,
+            ['crypto_asset_id', 'source', 'interval', 'open_time'],
+            [
+                'close_time',
+                'open_price',
+                'high_price',
+                'low_price',
+                'close_price',
+                'base_volume',
+                'quote_volume',
+                'trade_count',
+                'taker_buy_base_volume',
+                'taker_buy_quote_volume',
+                'ignored_value',
+                'raw_payload',
+                'updated_at',
+            ],
+        );
+
+        app(CryptoCache::class)->flush();
+
+        return count($rows);
     }
 
     private function client(): PendingRequest
